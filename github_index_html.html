@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#5e35b1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="루틴표">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E🌟%3C/text%3E%3C/svg%3E">
+    <title>우리 아이 주간 루틴표</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
+            background: linear-gradient(135deg, #e3f2fd 0%, #e1bee7 100%);
+            min-height: 100vh;
+            padding: 16px;
+            -webkit-tap-highlight-color: transparent;
+            padding-bottom: 80px;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 { font-size: 24px; color: #333; margin-bottom: 8px; }
+        h2 { font-size: 18px; color: #333; margin-bottom: 12px; }
+        .subtitle { color: #666; font-size: 14px; margin-bottom: 16px; }
+        
+        .routine-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        .routine-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .routine-emoji { font-size: 28px; }
+        .routine-name { font-size: 16px; font-weight: 600; color: #333; }
+        .routine-trigger {
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+            margin-left: 36px;
+            margin-bottom: 12px;
+        }
+        .days-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+        }
+        .day-box { text-align: center; }
+        .day-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #5e35b1;
+            margin-bottom: 4px;
+        }
+        .day-btn {
+            width: 100%;
+            height: 60px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .day-btn:active { transform: scale(0.95); }
+        .day-btn.checked {
+            background: #4caf50;
+            border-color: #4caf50;
+            box-shadow: 0 2px 8px rgba(76,175,80,0.4);
+        }
+        .day-btn.circle {
+            background: #ffc107;
+            border-color: #ffc107;
+            box-shadow: 0 2px 8px rgba(255,193,7,0.4);
+        }
+        .day-btn.off {
+            background: #e0e0e0;
+            border-color: #ccc;
+            color: #999;
+            cursor: not-allowed;
+        }
+        
+        .section-header {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+        .morning { background: #fff9c4; color: #f57f17; }
+        .afternoon { background: #ffe0b2; color: #e65100; }
+        .evening { background: #e1bee7; color: #6a1b9a; }
+        
+        .activity-btn {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: white;
+            text-align: left;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .activity-btn:active { transform: scale(0.98); }
+        .activity-btn.selected {
+            background: #ec407a;
+            color: white;
+            border-color: #ec407a;
+        }
+        .bridge-btn.selected {
+            background: #5e35b1;
+            color: white;
+            border-color: #5e35b1;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 4px;
+            margin-bottom: 12px;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #5e35b1;
+        }
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .save-btn {
+            width: 100%;
+            padding: 14px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .save-btn:active { opacity: 0.8; }
+        
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #4caf50, #2196f3);
+            color: white;
+            padding: 24px 32px;
+            border-radius: 16px;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+            animation: bounce 0.5s;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+        
+        .recovery-item {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            color: #555;
+        }
+        .recovery-num { font-weight: bold; color: #00acc1; }
+        
+        @media (min-width: 768px) and (orientation: landscape) {
+            .days-grid { gap: 12px; }
+            .day-btn { height: 70px; }
+            h1 { font-size: 28px; }
+            .routine-emoji { font-size: 32px; }
+        }
+        
+        @media (min-width: 768px) {
+            .weekend-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+        }
+        
+        .checkmark {
+            width: 28px;
+            height: 28px;
+            stroke: white;
+            stroke-width: 4;
+            fill: none;
+        }
+        .circle-icon {
+            width: 24px;
+            height: 24px;
+            border: 4px solid white;
+            border-radius: 50%;
+        }
+        
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #5e35b1;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: none;
+            z-index: 999;
+            max-width: 90%;
+            text-align: center;
+        }
+        .install-btn {
+            background: white;
+            color: #5e35b1;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-top: 8px;
+            margin-right: 8px;
+            cursor: pointer;
+        }
+        .close-btn {
+            background: transparent;
+            color: white;
+            border: 1px solid white;
+            padding: 8px 20px;
+            border-radius: 6px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div id="popup" class="popup"></div>
+    
+    <div id="installPrompt" class="install-prompt">
+        <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px;">📱 홈 화면에 추가하기</div>
+        <div style="font-size: 13px; margin-bottom: 12px;">앱처럼 편하게 사용하세요!</div>
+        <button class="install-btn" onclick="installApp()">설치하기</button>
+        <button class="close-btn" onclick="closeInstall()">나중에</button>
+    </div>
+    
+    <div class="container">
+        <div class="card">
+            <h1>⭐ 우리 아이 주간 루틴표</h1>
+            <div class="subtitle">✨ 금요일은 쉬는 날! 하고 싶으면 하고, 안 해도 괜찮아요.</div>
+        </div>
+
+        <div id="monthlyGrowth" class="card" style="display:none; border-left: 4px solid #9c27b0;">
+            <h2>🌱 이번 달 달라진 점</h2>
+            <label>1개월 전에 비해 더 쉬워진 것:</label>
+            <input type="text" id="monthlyEasier">
+            <label>새로 할 수 있게 된 것:</label>
+            <input type="text" id="monthlyNew">
+            <label>나만의 팁:</label>
+            <input type="text" id="monthlyTip">
+            <button class="save-btn" onclick="saveMonthlyGrowth()">저장하기</button>
+        </div>
+
+        <div class="card">
+            <h2>📅 요일별 루틴</h2>
+            
+            <div class="section-header morning">🌅 아침 루틴</div>
+            <div id="morningRoutines"></div>
+            
+            <div class="section-header afternoon">☀️ 오후 루틴</div>
+            <div id="afternoonRoutines"></div>
+            
+            <div class="section-header evening">🌙 저녁 루틴</div>
+            <div id="eveningRoutines"></div>
+        </div>
+
+        <div class="card" style="border-left: 4px solid #00bcd4;">
+            <h2>🌧️ 오늘 루틴이 힘들 때는 이렇게!</h2>
+            <div class="recovery-item">
+                <span class="recovery-num">1️⃣</span>
+                <span><strong>오늘 루틴이 안 될 때</strong> → 하나만 골라서 하기</span>
+            </div>
+            <div class="recovery-item">
+                <span class="recovery-num">2️⃣</span>
+                <span><strong>그것도 힘들 때</strong> → 5분만 하기</span>
+            </div>
+            <div class="recovery-item">
+                <span class="recovery-num">3️⃣</span>
+                <span><strong>그래도 힘들 때</strong> → 체크 대신 ⭕ 표시 (한 번 더 클릭)</span>
+            </div>
+            <div class="recovery-item">
+                <span class="recovery-num">4️⃣</span>
+                <div>
+                    <strong>왜 힘들었을까?</strong><br>
+                    <div style="margin-top:8px; padding:12px; background:#f5f5f5; border-radius:8px; font-size:12px;">
+                        □ 피곤해서<br>
+                        □ 시간이 없어서<br>
+                        □ 집중이 안 돼서<br>
+                        □ 기분이 안 좋아서
+                    </div>
+                </div>
+            </div>
+            <div style="margin-top:12px; padding:12px; background:#fff9c4; border-radius:8px; text-align:center; font-weight:600; color:#f57f17;">
+                ⭕가 있으면 오늘은 성공!
+            </div>
+        </div>
+
+        <div class="weekend-grid">
+            <div class="card" style="border-left: 4px solid #ec407a;">
+                <h2>✨ 토요일 특별 활동</h2>
+                <div class="subtitle">두 개까지 골라도 돼. 안 골라도 실패 아냐!</div>
+                <div id="saturdayActivities"></div>
+            </div>
+
+            <div class="card" style="border-left: 4px solid #5e35b1;">
+                <h2>🌉 일요일 브릿지 (10분)</h2>
+                <div class="subtitle">이건 공부 아니고, 월요일 문만 열어두는 거야. 하나만 선택!</div>
+                <div id="sundayBridges"></div>
+            </div>
+        </div>
+
+        <div class="card" style="border-left: 4px solid #4caf50;">
+            <h2>💭 이번 주 한 마디 (일요일 선택)</h2>
+            <div class="subtitle">한 줄만 써도 OK, 안 써도 괜찮아!</div>
+            <label>제일 쉬웠던 것:</label>
+            <input type="text" id="weeklyEasy" placeholder="예: 영어 듣기">
+            <label>힘들었던 것:</label>
+            <input type="text" id="weeklyHard" placeholder="예: 수요일 수학">
+            <label>다음 주 작전:</label>
+            <input type="text" id="weeklyPlan" placeholder="예: 수학 먼저 하기">
+            <button class="save-btn" onclick="saveWeeklyReflection()">저장하기</button>
+        </div>
+
+        <div class="card" style="background:#e8f5e9; border-left:4px solid #4caf50; text-align:center; color:#2e7d32; font-weight:600;">
+            💚 이 루틴표는 잘했는지 확인하는 표가 아니라, 다음 날을 쉽게 만드는 구조표입니다.
+        </div>
+    </div>
+
+    <script>
+        const days = ['월', '화', '수', '목', '금'];
+        const routines = {
+            morning: [
+                { id: 'english', name: '영어도서관 30분', emoji: '📚', trigger: '아침밥 먹으면서' },
+                { id: 'math', name: '핀란드수학 2페이지', emoji: '🔢', off: true, trigger: '영어 끝나면' },
+                { id: 'hanja', name: '한자/일일연산 2페이지', emoji: '✍️', off: true, trigger: '수학 끝나면' }
+            ],
+            afternoon: [
+                { id: 'ort', name: 'ORT 청독 30분', emoji: '🎧', off: true, trigger: '태권도 마치고 간식 먹고' },
+                { id: 'reading', name: '책 읽기 (선택)', emoji: '📖', trigger: '엄마 저녁 준비할 때' }
+            ],
+            evening: [
+                { id: 'ringfit', name: '링핏 30분 (선택)', emoji: '🎮', trigger: '저녁 먹고' }
+            ]
+        };
+        
+        const saturdayActivities = ['보드게임 1판', '그림 그리기 (물감 가능)', '만들기 활동', '도서관 다녀오기', '예능 프로그램 함께 보기'];
+        const sundayBridges = ['영어도서관', 'ORT', '수학 문제 1개만', '책 4페이지만 읽기 (더 읽어도 좋음)'];
+        
+        const greenMsg = ["오늘도 문 열어뒀네! 👍", "내일이 쉬워지는 중!", "좋아, 한 걸음 더! 🚀", "루틴 마스터 등장! ✨", "오늘 참 잘했어!", "이게 바로 습관의 힘! 💪", "월요일이 편해질 거야!", "멋진데? 😊", "계속 이렇게! 🌟", "너의 선택이 만드는 변화!"];
+        const yellowMsg = ["괜찮아! 시도한 것만으로 충분해! 💙", "힘들 땐 이렇게! 잘했어! 🌈", "오늘은 이 정도면 성공이야! ✨", "완벽하지 않아도 괜찮아! 👏", "조금만 해도 대단한 거야! 💪", "힘든 날도 있는 거지! 화이팅! 🌟", "노력했다는 게 중요해! 😊", "이것도 성공이야! 🎉", "내일은 더 나을 거야! 🌱", "시도한 거 자체가 멋져! 💚"];
+        
+        let data = { routines: {}, weekend: [], bridge: '', weekly: {}, monthly: {} };
+        let deferredPrompt;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            setTimeout(() => {
+                if (!localStorage.getItem('installDismissed')) {
+                    document.getElementById('installPrompt').style.display = 'block';
+                }
+            }, 3000);
+        });
+        
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(() => {
+                    deferredPrompt = null;
+                    document.getElementById('installPrompt').style.display = 'none';
+                });
+            }
+        }
+        
+        function closeInstall() {
+            document.getElementById('installPrompt').style.display = 'none';
+            localStorage.setItem('installDismissed', 'true');
+        }
+        
+        function load() {
+            const saved = localStorage.getItem('routineData');
+            if (saved) data = JSON.parse(saved);
+            
+            document.getElementById('weeklyEasy').value = data.weekly.easy || '';
+            document.getElementById('weeklyHard').value = data.weekly.hard || '';
+            document.getElementById('weeklyPlan').value = data.weekly.plan || '';
+            document.getElementById('monthlyEasier').value = data.monthly.easier || '';
+            document.getElementById('monthlyNew').value = data.monthly.newSkill || '';
+            document.getElementById('monthlyTip').value = data.monthly.tip || '';
+            
+            const today = new Date();
+            if (today.getDay() === 0) {
+                const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate();
+                if (lastDay - today.getDate() < 7) {
+                    document.getElementById('monthlyGrowth').style.display = 'block';
+                }
+            }
+        }
+        
+        function save() {
+            localStorage.setItem('routineData', JSON.stringify(data));
+        }
+        
+        function showMsg(type) {
+            const msgs = type === 'green' ? greenMsg : yellowMsg;
+            const msg = msgs[Math.floor(Math.random() * msgs.length)];
+            const popup = document.getElementById('popup');
+            popup.textContent = msg;
+            popup.style.display = 'block';
+            setTimeout(() => popup.style.display = 'none', 2000);
+        }
+        
+        function toggle(id, day) {
+            const key = id + '-' + day;
+            const state = data.routines[key] || 'empty';
+            
+            if (state === 'empty') {
+                data.routines[key] = 'checked';
+                showMsg('green');
+            } else if (state === 'checked') {
+                data.routines[key] = 'circle';
+                showMsg('yellow');
+            } else {
+                data.routines[key] = 'empty';
+            }
+            
+            save();
+            render();
+        }
+        
+        function createRoutine(r) {
+            let html = `<div class="routine-card">
+                <div class="routine-header">
+                    <span class="routine-emoji">${r.emoji}</span>
+                    <span class="routine-name">${r.name}</span>
+                </div>
+                <div class="routine-trigger">⏰ ${r.trigger}</div>
+                <div class="days-grid">`;
+            
+            days.forEach((d, i) => {
+                const off = r.off && i === 4;
+                const state = data.routines[r.id + '-' + d] || 'empty';
+                const cls = off ? 'off' : state;
+                
+                let content = '';
+                if (off) content = 'OFF';
+                else if (state === 'checked') content = '<svg class="checkmark" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
+                else if (state === 'circle') content = '<div class="circle-icon"></div>';
+                
+                html += `<div class="day-box">
+                    <div class="day-label">${d}</div>
+                    <button class="day-btn ${cls}" ${off ? 'disabled' : `onclick="toggle('${r.id}','${d}')"`}>
+                        ${content}
+                    </button>
+                </div>`;
+            });
+            
+            html += '</div></div>';
+            return html;
+        }
+        
+        function render() {
+            document.getElementById('morningRoutines').innerHTML = routines.morning.map(createRoutine).join('');
+            document.getElementById('afternoonRoutines').innerHTML = routines.afternoon.map(createRoutine).join('');
+            document.getElementById('eveningRoutines').innerHTML = routines.evening.map(createRoutine).join('');
+            
+            document.getElementById('saturdayActivities').innerHTML = saturdayActivities.map(a => 
+                `<button class="activity-btn ${data.weekend.includes(a) ? 'selected' : ''}" onclick="toggleWeekend('${a}')">${a}</button>`
+            ).join('');
+            
+            document.getElementById('sundayBridges').innerHTML = sundayBridges.map(b => 
+                `<button class="activity-btn bridge-btn ${data.bridge === b ? 'selected' : ''}" onclick="setBridge('${b}')">${b}</button>`
+            ).join('');
+        }
+        
+        function toggleWeekend(a) {
+            const idx = data.weekend.indexOf(a);
+            if (idx > -1) {
+                data.weekend.splice(idx, 1);
+            } else {
+                if (data.weekend.length >= 2) {
+                    alert('두 개까지만 선택할 수 있어요! 😊');
+                    return;
+                }
+                data.weekend.push(a);
+            }
+            save();
+            render();
+        }
+        
+        function setBridge(b) {
+            data.bridge = data.bridge === b ? '' : b;
+            save();
+            render();
+        }
+        
+        function saveWeeklyReflection() {
+            data.weekly = {
+                easy: document.getElementById('weeklyEasy').value,
+                hard: document.getElementById('weeklyHard').value,
+                plan: document.getElementById('weeklyPlan').value
+            };
+            save();
+            alert('이번 주 생각이 저장됐어! 👍');
+        }
+        
+        function saveMonthlyGrowth() {
+            data.monthly = {
+                easier: document.getElementById('monthlyEasier').value,
+                newSkill: document.getElementById('monthlyNew').value,
+                tip: document.getElementById('monthlyTip').value
+            };
+            save();
+            alert('이번 달 성장 기록이 저장됐어! 🌱');
+        }
+        
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(() => {});
+            });
+        }
+        
+        load();
+        render();
+    </script>
+</body>
+</html>
