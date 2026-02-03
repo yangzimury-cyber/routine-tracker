@@ -355,6 +355,9 @@
             <label>다음 주 작전:</label>
             <input type="text" id="weeklyPlan" placeholder="예: 수학 먼저 하기">
             <button class="save-btn" onclick="saveWeeklyReflection()">저장하기</button>
+            <button class="save-btn" onclick="sendWeeklyEmail()" style="background: #2196f3; margin-top: 8px;">
+                📧 이번 주 기록 메일 보내기
+            </button>
         </div>
 
         <div class="card" style="background:#e8f5e9; border-left:4px solid #4caf50; text-align:center; color:#2e7d32; font-weight:600;">
@@ -538,6 +541,98 @@
             };
             save();
             alert('이번 주 생각이 저장됐어! 👍');
+        }
+        
+        function sendWeeklyEmail() {
+            // Calculate summary
+            let greenCount = 0;
+            let yellowCount = 0;
+            let routineDetails = [];
+            
+            const routineNames = {
+                'english': '📚 영어도서관',
+                'math': '🔢 핀란드수학',
+                'hanja': '✍️ 한자/연산',
+                'ort': '🎧 ORT 청독',
+                'reading': '📖 책 읽기',
+                'ringfit': '🎮 링핏'
+            };
+            
+            // Count and detail each routine
+            Object.entries(data.routines).forEach(([key, state]) => {
+                if (state === 'checked') greenCount++;
+                if (state === 'circle') yellowCount++;
+            });
+            
+            // Build routine details
+            Object.keys(routineNames).forEach(id => {
+                let daysCompleted = [];
+                let daysPartial = [];
+                
+                days.forEach(day => {
+                    const state = data.routines[id + '-' + day];
+                    if (state === 'checked') daysCompleted.push(day);
+                    if (state === 'circle') daysPartial.push(day);
+                });
+                
+                if (daysCompleted.length > 0 || daysPartial.length > 0) {
+                    let detail = routineNames[id] + ': ';
+                    if (daysCompleted.length > 0) detail += '✅ ' + daysCompleted.join(',') + ' ';
+                    if (daysPartial.length > 0) detail += '⭕ ' + daysPartial.join(',');
+                    routineDetails.push(detail);
+                }
+            });
+            
+            // Get current week dates
+            const today = new Date();
+            const weekStr = `${today.getMonth() + 1}월 ${today.getDate()}일 주`;
+            
+            // Build email content
+            const subject = `[루틴표] ${weekStr} 기록`;
+            const body = `안녕하세요!
+
+이번 주 루틴 기록을 보내드립니다.
+
+━━━━━━━━━━━━━━━━━━━━━━
+📊 이번 주 요약
+━━━━━━━━━━━━━━━━━━━━━━
+
+✅ 초록 체크: ${greenCount}개
+⭕ 노란 동그라미: ${yellowCount}개
+📈 총 성공: ${greenCount + yellowCount}개
+
+━━━━━━━━━━━━━━━━━━━━━━
+📝 루틴별 세부 내역
+━━━━━━━━━━━━━━━━━━━━━━
+
+${routineDetails.join('\n') || '기록 없음'}
+
+━━━━━━━━━━━━━━━━━━━━━━
+🌈 주말 활동
+━━━━━━━━━━━━━━━━━━━━━━
+
+토요일 특별 활동: ${data.weekend.join(', ') || '선택 안 함'}
+일요일 브릿지: ${data.bridge || '선택 안 함'}
+
+━━━━━━━━━━━━━━━━━━━━━━
+💭 이번 주 한 마디
+━━━━━━━━━━━━━━━━━━━━━━
+
+제일 쉬웠던 것: ${data.weekly.easy || '-'}
+힘들었던 것: ${data.weekly.hard || '-'}
+다음 주 작전: ${data.weekly.plan || '-'}
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+⭕가 있어도 성공입니다! 
+잘 하고 있어요 💚
+`;
+            
+            // Create mailto link
+            const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            // Open email app
+            window.location.href = mailtoLink;
         }
         
         function saveMonthlyGrowth() {
