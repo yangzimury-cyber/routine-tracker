@@ -258,10 +258,97 @@
             margin-top: 8px;
             cursor: pointer;
         }
+        
+        /* Weekly Reset Modal */
+        .reset-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .reset-modal.show { display: flex; }
+        .reset-content {
+            background: white;
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .reset-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 16px;
+        }
+        .reset-message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        .reset-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .reset-btn {
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .reset-btn:active { transform: scale(0.98); }
+        .reset-btn.primary {
+            background: #2196f3;
+            color: white;
+        }
+        .reset-btn.danger {
+            background: #ff5722;
+            color: white;
+        }
+        .reset-btn.secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
     </style>
 </head>
 <body>
     <div id="popup" class="popup"></div>
+    
+    <!-- Weekly Reset Modal -->
+    <div id="resetModal" class="reset-modal">
+        <div class="reset-content">
+            <div class="reset-title">🌟 새로운 주가 시작됐어요!</div>
+            <div class="reset-message">
+                지난주 기록을 삭제하고<br>
+                새로 시작할까요?<br><br>
+                <small style="color: #999;">💡 메일로 보내면 기록이 보관돼요</small>
+            </div>
+            <div class="reset-buttons">
+                <button class="reset-btn primary" onclick="sendWeeklyEmailFromModal()">
+                    📧 메일 먼저 보내기
+                </button>
+                <button class="reset-btn danger" onclick="resetWeeklyData()">
+                    🔄 삭제하고 새로 시작
+                </button>
+                <button class="reset-btn secondary" onclick="closeResetModal()">
+                    ❌ 취소 (그대로 유지)
+                </button>
+            </div>
+        </div>
+    </div>
     
     <div id="installPrompt" class="install-prompt">
         <div style="font-size: 16px; font-weight: bold; margin-bottom: 8px;">📱 홈 화면에 추가하기</div>
@@ -434,6 +521,69 @@
                     document.getElementById('monthlyGrowth').style.display = 'block';
                 }
             }
+            
+            // Check for weekly reset (Monday check)
+            checkWeeklyReset();
+        }
+        
+        function checkWeeklyReset() {
+            const today = new Date();
+            const currentWeek = getWeekNumber(today);
+            const lastWeek = localStorage.getItem('lastWeek');
+            
+            // If it's Monday and a new week
+            if (today.getDay() === 1 && lastWeek && lastWeek !== currentWeek) {
+                // Show reset modal
+                setTimeout(() => {
+                    document.getElementById('resetModal').classList.add('show');
+                }, 1000);
+            }
+            
+            // Update last week
+            localStorage.setItem('lastWeek', currentWeek);
+        }
+        
+        function getWeekNumber(date) {
+            const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+            const dayNum = d.getUTCDay() || 7;
+            d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+            const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+            const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+            return d.getUTCFullYear() + '-W' + weekNo;
+        }
+        
+        function closeResetModal() {
+            document.getElementById('resetModal').classList.remove('show');
+        }
+        
+        function resetWeeklyData() {
+            if (confirm('정말 지난주 기록을 삭제할까요?\n(이 작업은 되돌릴 수 없어요!)')) {
+                // Clear routines
+                data.routines = {};
+                data.weekend = [];
+                data.bridge = '';
+                data.weekly = {};
+                
+                save();
+                render();
+                
+                // Clear input fields
+                document.getElementById('weeklyEasy').value = '';
+                document.getElementById('weeklyHard').value = '';
+                document.getElementById('weeklyPlan').value = '';
+                
+                closeResetModal();
+                alert('새로운 주가 시작됐어요! 화이팅! 🌟');
+            }
+        }
+        
+        function sendWeeklyEmailFromModal() {
+            sendWeeklyEmail();
+            setTimeout(() => {
+                if (confirm('메일을 보냈나요?\n보냈으면 "확인"을 눌러주세요.')) {
+                    closeResetModal();
+                }
+            }, 1000);
         }
         
         function save() {
@@ -544,6 +694,11 @@
         }
         
         function sendWeeklyEmail() {
+            // Ensure data structure exists
+            if (!data.weekly) data.weekly = {};
+            if (!data.weekend) data.weekend = [];
+            if (!data.routines) data.routines = {};
+            
             // Calculate summary
             let greenCount = 0;
             let yellowCount = 0;
@@ -605,13 +760,13 @@
 📝 루틴별 세부 내역
 ━━━━━━━━━━━━━━━━━━━━━━
 
-${routineDetails.join('\n') || '기록 없음'}
+${routineDetails.length > 0 ? routineDetails.join('\n') : '기록 없음'}
 
 ━━━━━━━━━━━━━━━━━━━━━━
 🌈 주말 활동
 ━━━━━━━━━━━━━━━━━━━━━━
 
-토요일 특별 활동: ${data.weekend.join(', ') || '선택 안 함'}
+토요일 특별 활동: ${data.weekend && data.weekend.length > 0 ? data.weekend.join(', ') : '선택 안 함'}
 일요일 브릿지: ${data.bridge || '선택 안 함'}
 
 ━━━━━━━━━━━━━━━━━━━━━━
