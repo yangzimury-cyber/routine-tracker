@@ -458,10 +458,10 @@
             morning: [
                 { id: 'english', name: '영어도서관 30분', emoji: '📚', trigger: '아침밥 먹으면서' },
                 { id: 'math', name: '핀란드수학 2페이지', emoji: '🔢', off: true, trigger: '영어 끝나면' },
-                { id: 'hanja', name: '한자/일일연산 2페이지', emoji: '✍️', off: true, trigger: '수학 끝나면' }
+                { id: 'hanja', name: '한자 2페이지', emoji: '✍️', offDays: [1, 3], trigger: '수학 끝나면' }
             ],
             afternoon: [
-                { id: 'ort', name: 'ORT 청독 30분', emoji: '🎧', off: true, trigger: '태권도 마치고 간식 먹고' },
+                { id: 'ort', name: '집중듣기 30분', emoji: '🎧', off: true, trigger: '학교 다녀와서 간식 먹으면서' },
                 { id: 'reading', name: '책 읽기 (선택)', emoji: '📖', trigger: '엄마 저녁 준비할 때' }
             ],
             evening: [
@@ -627,18 +627,19 @@
                 <div class="days-grid">`;
             
             days.forEach((d, i) => {
-                const off = r.off && i === 4;
+                // Check if this day is OFF
+                const isOff = (r.off && i === 4) || (r.offDays && r.offDays.includes(i));
                 const state = data.routines[r.id + '-' + d] || 'empty';
-                const cls = off ? 'off' : state;
+                const cls = isOff ? 'off' : state;
                 
                 let content = '';
-                if (off) content = 'OFF';
+                if (isOff) content = 'OFF';
                 else if (state === 'checked') content = '<svg class="checkmark" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
                 else if (state === 'circle') content = '<div class="circle-icon"></div>';
                 
                 html += `<div class="day-box">
                     <div class="day-label">${d}</div>
-                    <button class="day-btn ${cls}" ${off ? 'disabled' : `onclick="toggle('${r.id}','${d}')"`}>
+                    <button class="day-btn ${cls}" ${isOff ? 'disabled' : `onclick="toggle('${r.id}','${d}')"`}>
                         ${content}
                     </button>
                 </div>`;
@@ -707,8 +708,8 @@
             const routineNames = {
                 'english': '📚 영어도서관',
                 'math': '🔢 핀란드수학',
-                'hanja': '✍️ 한자/연산',
-                'ort': '🎧 ORT 청독',
+                'hanja': '✍️ 한자',
+                'ort': '🎧 집중듣기',
                 'reading': '📖 책 읽기',
                 'ringfit': '🎮 링핏'
             };
