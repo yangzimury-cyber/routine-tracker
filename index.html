@@ -7,7 +7,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="루틴표">
-    <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E🌟%3C/text%3E%3C/svg%3E">
     <title>우리 아이 주간 루틴표</title>
     <style>
@@ -17,10 +16,9 @@
             background: linear-gradient(135deg, #e3f2fd 0%, #e1bee7 100%);
             min-height: 100vh;
             padding: 16px;
-            -webkit-tap-highlight-color: transparent;
             padding-bottom: 80px;
         }
-        .container { max-width: 1200px; margin: 0 auto; }
+        .container { max-width: 800px; margin: 0 auto; }
         .card {
             background: white;
             border-radius: 16px;
@@ -28,212 +26,123 @@
             margin-bottom: 16px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
-        h1 { font-size: 24px; color: #333; margin-bottom: 8px; }
+        h1 { font-size: 22px; color: #333; margin-bottom: 8px; }
         h2 { font-size: 18px; color: #333; margin-bottom: 12px; }
-        .subtitle { color: #666; font-size: 14px; margin-bottom: 16px; }
         
+        /* 필터 버튼 스타일 */
+        .filter-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .filter-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #5e35b1;
+            border-radius: 10px;
+            background: white;
+            color: #5e35b1;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .filter-btn.active {
+            background: #5e35b1;
+            color: white;
+        }
+
         .routine-card {
             background: #f8f9fa;
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 12px;
+            position: relative;
         }
         .routine-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
             margin-bottom: 8px;
         }
-        .routine-emoji { font-size: 28px; }
-        .routine-name { font-size: 16px; font-weight: 600; color: #333; }
+        .routine-info { display: flex; align-items: center; gap: 8px; }
+        .routine-emoji { font-size: 24px; }
+        .routine-name { font-size: 15px; font-weight: 600; }
+        
+        /* 진행률 바 스타일 */
+        .progress-container {
+            width: 80px;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: #4caf50;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
         .routine-trigger {
-            font-size: 12px;
-            color: #666;
-            font-style: italic;
-            margin-left: 36px;
+            font-size: 11px;
+            color: #777;
             margin-bottom: 12px;
+            margin-left: 32px;
         }
-        .days-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-        }
-        /* 주 7일용 그리드 설정 */
-        .days-grid.seven-days {
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-        }
+
+        .days-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+        .days-grid.seven-days { grid-template-columns: repeat(7, 1fr); }
+
         .day-box { text-align: center; }
-        .day-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #5e35b1;
-            margin-bottom: 4px;
-        }
+        .day-label { font-size: 10px; font-weight: bold; color: #999; margin-bottom: 4px; }
+        
+        /* 오늘 하이라이트 스타일 */
+        .day-box.is-today .day-label { color: #ec407a; font-size: 11px; }
+        
         .day-btn {
             width: 100%;
-            height: 60px;
-            border: 2px solid #ddd;
-            border-radius: 12px;
+            height: 45px;
+            border: 1.5px solid #ddd;
+            border-radius: 8px;
             background: white;
-            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
-            transition: all 0.2s;
-        }
-        /* 7일 버튼은 모바일 대응을 위해 높이를 약간 조절 */
-        .seven-days .day-btn {
-            height: 50px;
-            border-radius: 8px;
-        }
-        .day-btn:active { transform: scale(0.95); }
-        .day-btn.checked {
-            background: #4caf50;
-            border-color: #4caf50;
-            box-shadow: 0 2px 8px rgba(76,175,80,0.4);
-        }
-        .day-btn.circle {
-            background: #ffc107;
-            border-color: #ffc107;
-            box-shadow: 0 2px 8px rgba(255,193,7,0.4);
-        }
-        .day-btn.off {
-            background: #e0e0e0;
-            border-color: #ccc;
-            color: #999;
-            cursor: not-allowed;
-        }
-        
-        .section-header {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-        .morning { background: #fff9c4; color: #f57f17; }
-        .afternoon { background: #ffe0b2; color: #e65100; }
-        .evening { background: #e1bee7; color: #6a1b9a; }
-        
-        .activity-btn {
-            width: 100%;
-            padding: 14px;
-            margin-bottom: 8px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            background: white;
-            text-align: left;
-            font-size: 14px;
             cursor: pointer;
-            transition: all 0.2s;
         }
-        .activity-btn:active { transform: scale(0.98); }
-        .activity-btn.selected {
-            background: #ec407a;
-            color: white;
-            border-color: #ec407a;
-        }
-        .bridge-btn.selected {
-            background: #5e35b1;
-            color: white;
-            border-color: #5e35b1;
-        }
+        .day-box.is-today .day-btn { border-color: #ec407a; border-width: 2px; background: #fff5f8; }
         
-        input[type="text"] {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            font-size: 14px;
-            margin-top: 4px;
-            margin-bottom: 12px;
-        }
-        input[type="text"]:focus {
-            outline: none;
-            border-color: #5e35b1;
-        }
-        label {
-            font-size: 13px;
-            font-weight: 600;
-            color: #555;
-        }
-        
+        .day-btn.checked { background: #4caf50; border-color: #4caf50; }
+        .day-btn.circle { background: #ffc107; border-color: #ffc107; }
+        .day-btn.off { background: #eee; border-color: #ddd; color: #ccc; cursor: not-allowed; }
+
+        .checkmark { width: 20px; height: 20px; stroke: white; stroke-width: 4; fill: none; }
+        .circle-icon { width: 16px; height: 16px; border: 3px solid white; border-radius: 50%; }
+
         .save-btn {
             width: 100%;
             padding: 14px;
-            background: #4caf50;
+            background: #2196f3;
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
+            border-radius: 12px;
+            font-weight: bold;
             cursor: pointer;
         }
-        .save-btn:active { opacity: 0.8; }
-        
-        .popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #4caf50, #2196f3);
-            color: white;
-            padding: 24px 32px;
-            border-radius: 16px;
-            font-size: 20px;
-            font-weight: bold;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-            z-index: 1000;
-            display: none;
-            animation: bounce 0.5s;
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.1); }
-        }
-        
-        .recovery-item {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
-            font-size: 13px;
-            color: #555;
-        }
-        .recovery-num { font-weight: bold; color: #00acc1; }
-        
-        @media (min-width: 768px) and (orientation: landscape) {
-            .days-grid { gap: 12px; }
-            .day-btn { height: 70px; }
-            h1 { font-size: 28px; }
-            .routine-emoji { font-size: 32px; }
-        }
-        
-        .checkmark {
-            width: 28px;
-            height: 28px;
-            stroke: white;
-            stroke-width: 4;
-            fill: none;
-        }
-        .circle-icon {
-            width: 24px;
-            height: 24px;
-            border: 4px solid white;
-            border-radius: 50%;
-        }
-        
-        .reset-section {
-            margin-top: 24px;
-            text-align: center;
-        }
-        .reset-link {
-            font-size: 12px;
+        .reset-btn {
+            margin-top: 20px;
+            background: none;
+            border: none;
             color: #999;
             text-decoration: underline;
+            font-size: 12px;
+            width: 100%;
             cursor: pointer;
+        }
+
+        .popup {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8); color: white; padding: 15px 25px;
+            border-radius: 30px; display: none; z-index: 1000;
         }
     </style>
 </head>
@@ -242,207 +151,139 @@
     
     <div class="container">
         <div class="card">
-            <h1>⭐ 우리 아이 주간 루틴표</h1>
-            <div class="subtitle">✨ 금요일은 쉬는 날! 하고 싶으면 하고, 안 해도 괜찮아요.</div>
-        </div>
-
-        <div id="monthlyGrowth" class="card" style="display:none; border-left: 4px solid #9c27b0;">
-            <h2>🌱 이번 달 달라진 점</h2>
-            <label>1개월 전에 비해 더 쉬워진 것:</label>
-            <input type="text" id="monthlyEasier">
-            <label>새로 할 수 있게 된 것:</label>
-            <input type="text" id="monthlyNew">
-            <label>나만의 팁:</label>
-            <input type="text" id="monthlyTip">
-            <button class="save-btn" onclick="saveMonthlyGrowth()">저장하기</button>
-        </div>
-
-        <div class="card">
-            <h2>📅 요일별 루틴</h2>
-            
-            <div class="section-header morning">🌅 아침 루틴</div>
-            <div id="morningRoutines"></div>
-            
-            <div class="section-header afternoon">☀️ 오후 루틴</div>
-            <div id="afternoonRoutines"></div>
-            
-            <div class="section-header evening">🌙 저녁 루틴</div>
-            <div id="eveningRoutines"></div>
-        </div>
-
-        <div class="card" style="border-left: 4px solid #ec407a;">
-            <h2>✨ 토요일 특별 활동</h2>
-            <div class="subtitle">두 개까지 골라도 돼. 안 골라도 실패 아냐!</div>
-            <div id="saturdayActivities"></div>
-        </div>
-
-        <div class="card" style="border-left: 4px solid #5e35b1;">
-            <h2>🌉 일요일 브릿지 (10분)</h2>
-            <div class="subtitle">이건 공부 아니고, 월요일 문만 열어두는 거야. 하나만 선택!</div>
-            <div id="sundayBridges"></div>
-        </div>
-
-        <div class="card" style="border-left: 4px solid #4caf50;">
-            <h2>💭 이번 주 기록</h2>
-            <button class="save-btn" onclick="sendWeeklyEmail()" style="background: #2196f3;">
-                📧 이번 주 기록 메일 보내기
-            </button>
-            <div class="reset-section">
-                <span class="reset-link" onclick="manualResetRoutines()">전체 데이터 초기화하기</span>
+            <h1>🌟 우리 아이 루틴표</h1>
+            <div class="filter-container">
+                <button id="viewAll" class="filter-btn active" onclick="setFilter('all')">전체 보기</button>
+                <button id="viewToday" class="filter-btn" onclick="setFilter('today')">오늘 것만 보기</button>
             </div>
         </div>
 
-        <div class="card" style="background:#e8f5e9; border-left:4px solid #4caf50; text-align:center; color:#2e7d32; font-weight:600;">
-            💚 이 루틴표는 다음 날을 쉽게 만드는 구조표입니다.
+        <div id="routineList"></div>
+
+        <div class="card">
+            <button class="save-btn" onclick="sendEmail()">📧 이번 주 기록 보내기</button>
+            <button class="reset-btn" onclick="resetAll()">기록 초기화하기</button>
         </div>
     </div>
 
     <script>
         const weekdayList = ['월', '화', '수', '목', '금'];
         const fullWeekList = ['월', '화', '수', '목', '금', '토', '일'];
+        
+        // 오늘 요일 인덱스 (0:일, 1:월 ... 6:토) -> 루틴표 기준 (월:0 ~ 일:6) 재배치
+        const rawToday = new Date().getDay();
+        const todayIdx = rawToday === 0 ? 6 : rawToday - 1; 
+        const todayName = fullWeekList[todayIdx];
 
-        const routines = {
-            morning: [
-                { id: 'english', name: '영어도서관 30분', emoji: '📚', trigger: '아침밥 먹으면서' }
-            ],
-            afternoon: [
-                { id: 'backpack', name: '책가방 비우기', emoji: '🎒', trigger: '학교 다녀와서 곧장' },
-                { id: 'math', name: '핀란드 수학', emoji: '🔢', off: true, trigger: '하교 후 간식 먹으면서' },
-                { id: 'mathreview', name: '학교 수학 복습', emoji: '📐', offDays: [0, 1, 2, 3], trigger: '하교 후 간식 먹으면서' },
-                { id: 'ort', name: '집중듣기 30분', emoji: '🎧', off: true, trigger: '수학 끝나면' },
-                { id: 'hanja', name: '한자 2페이지', emoji: '✍️', offDays: [1, 3], trigger: '집중듣기 끝나면' },
-                { id: 'reading', name: '책 읽기', emoji: '📖', trigger: '자유시간 또는 저녁식사 전', weekendEnabled: true }
-            ],
-            evening: [
-                { id: 'ringfit', name: '운동 (러닝/링핏)', emoji: '🏃', trigger: '식후 한 시간 뒤', weekendEnabled: true }
-            ]
-        };
-        
-        const saturdayActivities = ['보드게임 1판', '그림 그리기', '만들기 활동', '도서관 다녀오기', '예능 프로그램 시청'];
-        const sundayBridges = ['영어도서관', 'ORT', '수학 문제 1개', '책 4페이지만'];
-        
-        const greenMsg = ["오늘도 문 열어뒀네! 👍", "좋아, 한 걸음 더! 🚀", "멋진데? 😊", "너의 선택이 만드는 변화!"];
-        const yellowMsg = ["괜찮아! 시도한 것만으로 충분해! 💙", "조금만 해도 대단한 거야! 💪", "시도한 거 자체가 멋져! 💚"];
-        
-        let data = { routines: {}, weekend: [], bridge: '', weekly: {}, monthly: {} };
-        
-        function load() {
-            const saved = localStorage.getItem('routineData');
-            if (saved) data = JSON.parse(saved);
+        const routines = [
+            { id: 'english', name: '영어도서관 30분', emoji: '📚', trigger: '아침밥 먹으면서', category: 'morning' },
+            { id: 'backpack', name: '책가방 비우기', emoji: '🎒', trigger: '학교 다녀와서 곧장', category: 'afternoon' },
+            { id: 'math', name: '핀란드 수학', emoji: '🔢', trigger: '간식 먹으면서', category: 'afternoon', offDays: [4] },
+            { id: 'reading', name: '책 읽기', emoji: '📖', trigger: '자유시간/식사 전', category: 'afternoon', weekendEnabled: true },
+            { id: 'ringfit', name: '운동 (러닝/링핏)', emoji: '🏃', trigger: '식후 한 시간 뒤', category: 'evening', weekendEnabled: true }
+        ];
+
+        let data = JSON.parse(localStorage.getItem('routineData')) || { routines: {} };
+        let currentFilter = 'all';
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.getElementById('viewAll').classList.toggle('active', filter === 'all');
+            document.getElementById('viewToday').classList.toggle('active', filter === 'today');
             render();
         }
-        
-        function save() {
-            localStorage.setItem('routineData', JSON.stringify(data));
-        }
-        
+
         function toggle(id, day) {
-            const key = id + '-' + day;
-            const state = data.routines[key] || 'empty';
-            
-            if (state === 'empty') {
-                data.routines[key] = 'checked';
-                showMsg('green');
-            } else if (state === 'checked') {
-                data.routines[key] = 'circle';
-                showMsg('yellow');
-            } else {
-                data.routines[key] = 'empty';
-            }
-            save();
+            const key = `${id}-${day}`;
+            const current = data.routines[key] || 'empty';
+            const next = current === 'empty' ? 'checked' : (current === 'checked' ? 'circle' : 'empty');
+            data.routines[key] = next;
+            localStorage.setItem('routineData', JSON.stringify(data));
             render();
-        }
-        
-        function showMsg(type) {
-            const msgs = type === 'green' ? greenMsg : yellowMsg;
-            const msg = msgs[Math.floor(Math.random() * msgs.length)];
-            const popup = document.getElementById('popup');
-            popup.textContent = msg;
-            popup.style.display = 'block';
-            setTimeout(() => popup.style.display = 'none', 2000);
+            if(next !== 'empty') showPopup(next === 'checked' ? "멋져요! 완벽해요 🌟" : "노력하는 모습이 아름다워요 💛");
         }
 
-        function createRoutine(r) {
-            // 주 7일 여부에 따라 요일 리스트 선택
-            const targetDays = r.weekendEnabled ? fullWeekList : weekdayList;
-            const gridClass = r.weekendEnabled ? 'seven-days' : '';
-
-            let html = `<div class="routine-card">
-                <div class="routine-header">
-                    <span class="routine-emoji">${r.emoji}</span>
-                    <span class="routine-name">${r.name}</span>
-                </div>
-                <div class="routine-trigger">⏰ ${r.trigger}</div>
-                <div class="days-grid ${gridClass}">`;
-            
-            targetDays.forEach((d, i) => {
-                const isOff = (r.off && i === 4) || (r.offDays && r.offDays.includes(i));
-                const state = data.routines[r.id + '-' + d] || 'empty';
-                const cls = isOff ? 'off' : state;
-                
-                let content = '';
-                if (isOff) content = 'OFF';
-                else if (state === 'checked') content = '<svg class="checkmark" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>';
-                else if (state === 'circle') content = '<div class="circle-icon"></div>';
-                
-                html += `<div class="day-box">
-                    <div class="day-label">${d}</div>
-                    <button class="day-btn ${cls}" ${isOff ? 'disabled' : `onclick="toggle('${r.id}','${d}')"`}>
-                        ${content}
-                    </button>
-                </div>`;
-            });
-            
-            html += '</div></div>';
-            return html;
+        function showPopup(msg) {
+            const p = document.getElementById('popup');
+            p.textContent = msg; p.style.display = 'block';
+            setTimeout(() => p.style.display = 'none', 1500);
         }
-        
+
         function render() {
-            document.getElementById('morningRoutines').innerHTML = routines.morning.map(createRoutine).join('');
-            document.getElementById('afternoonRoutines').innerHTML = routines.afternoon.map(createRoutine).join('');
-            document.getElementById('eveningRoutines').innerHTML = routines.evening.map(createRoutine).join('');
-            
-            document.getElementById('saturdayActivities').innerHTML = saturdayActivities.map(a => 
-                `<button class="activity-btn ${data.weekend.includes(a) ? 'selected' : ''}" onclick="toggleWeekend('${a}')">${a}</button>`
-            ).join('');
-            
-            document.getElementById('sundayBridges').innerHTML = sundayBridges.map(b => 
-                `<button class="activity-btn bridge-btn ${data.bridge === b ? 'selected' : ''}" onclick="setBridge('${b}')">${b}</button>`
-            ).join('');
-        }
+            const list = document.getElementById('routineList');
+            list.innerHTML = '';
 
-        function toggleWeekend(a) {
-            const idx = data.weekend.indexOf(a);
-            if (idx > -1) data.weekend.splice(idx, 1);
-            else {
-                if (data.weekend.length >= 2) return;
-                data.weekend.push(a);
-            }
-            save(); render();
-        }
-        
-        function setBridge(b) {
-            data.bridge = data.bridge === b ? '' : b;
-            save(); render();
-        }
+            routines.forEach(r => {
+                const targetDays = r.weekendEnabled ? fullWeekList : weekdayList;
+                
+                // 오늘 것만 보기 필터링: 주말 미포함 루틴인데 오늘이 주말이면 제외
+                if (currentFilter === 'today' && !targetDays.includes(todayName)) return;
 
-        function manualResetRoutines() {
-            if (confirm('모든 기록을 초기화할까요?')) {
-                data.routines = {}; data.weekend = []; data.bridge = '';
-                save(); render();
-            }
-        }
+                // 진행률 계산
+                const completed = targetDays.filter(d => data.routines[`${r.id}-${d}`] === 'checked' || data.routines[`${r.id}-${d}`] === 'circle').length;
+                const progress = (completed / targetDays.length) * 100;
 
-        function sendWeeklyEmail() {
-            let log = "📊 이번 주 루틴 기록\n\n";
-            Object.entries(data.routines).forEach(([key, state]) => {
-                if(state !== 'empty') log += `${key}: ${state === 'checked' ? '✅' : '⭕'}\n`;
+                const card = document.createElement('div');
+                card.className = 'card routine-card';
+                
+                let daysHtml = '';
+                targetDays.forEach((d, i) => {
+                    const isToday = d === todayName;
+                    // 필터가 'today'일 때는 오늘 요일만 렌더링
+                    if (currentFilter === 'today' && !isToday) return;
+
+                    const state = data.routines[`${r.id}-${d}`] || 'empty';
+                    const isOff = r.offDays?.includes(i);
+                    
+                    daysHtml += `
+                        <div class="day-box ${isToday ? 'is-today' : ''}">
+                            <div class="day-label">${d}</div>
+                            <button class="day-btn ${isOff ? 'off' : state}" ${isOff ? 'disabled' : `onclick="toggle('${r.id}','${d}')"`}>
+                                ${state === 'checked' ? '<svg class="checkmark" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>' : 
+                                  state === 'circle' ? '<div class="circle-icon"></div>' : (isOff ? 'OFF' : '')}
+                            </button>
+                        </div>`;
+                });
+
+                card.innerHTML = `
+                    <div class="routine-header">
+                        <div class="routine-info">
+                            <span class="routine-emoji">${r.emoji}</span>
+                            <span class="routine-name">${r.name}</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+                    <div class="routine-trigger">⏰ ${r.trigger}</div>
+                    <div class="days-grid ${r.weekendEnabled ? 'seven-days' : ''}">
+                        ${daysHtml}
+                    </div>
+                `;
+                list.appendChild(card);
             });
-            const mailtoLink = `mailto:?subject=이번주 루틴 기록&body=${encodeURIComponent(log)}`;
-            window.location.href = mailtoLink;
         }
 
-        load();
+        function resetAll() {
+            if(confirm("정말로 모든 기록을 지울까요? 새로운 주가 시작되었나요?")) {
+                data.routines = {};
+                localStorage.setItem('routineData', JSON.stringify(data));
+                render();
+            }
+        }
+
+        function sendEmail() {
+            let body = "📊 이번 주 루틴 결과\n\n";
+            routines.forEach(r => {
+                const targetDays = r.weekendEnabled ? fullWeekList : weekdayList;
+                const done = targetDays.filter(d => data.routines[`${r.id}-${d}`] === 'checked').join(', ');
+                const partial = targetDays.filter(d => data.routines[`${r.id}-${d}`] === 'circle').join(', ');
+                body += `${r.emoji} ${r.name}\n - 완료: ${done || '없음'}\n - 노력: ${partial || '없음'}\n\n`;
+            });
+            window.location.href = `mailto:?subject=루틴 보고서&body=${encodeURIComponent(body)}`;
+        }
+
+        render();
     </script>
 </body>
 </html>
