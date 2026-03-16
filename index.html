@@ -58,6 +58,10 @@
             grid-template-columns: repeat(5, 1fr);
             gap: 8px;
         }
+        .days-grid.weekend-enabled {
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+        }
         .day-box { text-align: center; }
         .day-label {
             font-size: 12px;
@@ -77,6 +81,9 @@
             justify-content: center;
             font-size: 12px;
             transition: all 0.2s;
+        }
+        .weekend-enabled .day-btn {
+            height: 50px;
         }
         .day-btn:active { transform: scale(0.95); }
         .day-btn.checked {
@@ -377,10 +384,10 @@
                 { id: 'mathreview', name: '학교 수학 복습 (디딤돌)', emoji: '📐', offDays: [0, 1, 2, 3], trigger: '하교 후 간식 먹으면서' },
                 { id: 'ort', name: '집중듣기 30분', emoji: '🎧', off: true, trigger: '수학 끝나면' },
                 { id: 'hanja', name: '한자 2페이지', emoji: '✍️', offDays: [1, 3], trigger: '집중듣기 끝나면' },
-                { id: 'reading', name: '책 읽기', emoji: '📖', trigger: '자유시간 또는 저녁식사 전 etc.' }
+                { id: 'reading', name: '책 읽기', emoji: '📖', trigger: '자유시간 또는 저녁식사 전 etc.', weekendEnabled: true }
             ],
             evening: [
-                { id: 'ringfit', name: '운동 (러닝/링핏 etc.)', emoji: '🏃', trigger: '식후 한 시간 뒤' }
+                { id: 'ringfit', name: '운동 (러닝/링핏 etc.)', emoji: '🏃', trigger: '식후 한 시간 뒤', weekendEnabled: true }
             ]
         };
         
