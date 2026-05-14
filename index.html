@@ -24,7 +24,8 @@
         .routine-emoji { font-size: 24px; }
         .routine-name { font-size: 15px; font-weight: 700; color: #333; }
         .effort-guide { font-size: 11px; color: #ff6f00; font-weight: 600; margin-left: 32px; margin-bottom: 4px; }
-        .routine-trigger { font-size: 11px; color: #777; font-style: italic; margin-bottom: 12px; margin-left: 32px; }
+        .routine-trigger { font-size: 11px; color: #777; font-style: italic; margin-bottom: 4px; margin-left: 32px; }
+        .routine-note { font-size: 11px; color: #666; margin-left: 32px; margin-bottom: 12px; line-height: 1.4; } /* 작은 안내 문구 스타일 */
         .days-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
         .days-grid.six-days { grid-template-columns: repeat(6, 1fr); }
         .days-grid.seven-days { grid-template-columns: repeat(7, 1fr); }
@@ -112,8 +113,8 @@
             afternoon: [
                 { id: 'backpack', name: '책가방 비우기', emoji: '🎒', trigger: '학교 다녀와서 곧장', allowSick: true },
                 { id: 'math_all', name: '수학공부(핀란드수학/학교수학/달콤수학)', emoji: '🔢', trigger: '간식 시간', weekendEnabled: true, allowSick: true },
-                // [수정] 알림 문구 수정
-                { id: 'english_listening', name: '영어책 집중듣기', emoji: '🎧', trigger: '수학 끝내고 재밌는 책 보자', isSixDay: true, allowSick: true },
+                // [수정] 안내 문구(instruction) 추가
+                { id: 'english_listening', name: '영어책 집중듣기', emoji: '🎧', trigger: '수학 끝내고 재밌는 책 보자', instruction: '오늘 읽은 책에서 제일 마음에 드는 문장 하나만 적어줘', isSixDay: true, allowSick: true },
                 { id: 'hanja', name: '한자 2페이지', emoji: '✍️', trigger: '집중듣기 끝나면', offDays: [1, 3], allowSick: true },
                 { id: 'reading_weekday', name: '자유 선택 독서', emoji: '📖', trigger: '평일 오후 읽고 싶은 책 꺼내기', weekdayOnly: true, allowSick: true },
                 { id: 'reading_weekend', name: '주말 고정 독서', emoji: '📕', trigger: '토~일 이야기책 읽기', weekendOnly: true, allowSick: true },
@@ -179,7 +180,17 @@
 
             if (currentFilter === 'today' && !r.isSixDay && r.offDays?.includes(todayIdx)) return '';
 
-            return `<div class="routine-card"><div class="routine-header"><span class="routine-emoji">${r.emoji}</span><span class="routine-name">${r.name}</span></div>${r.effort ? `<div class="effort-guide">⭕ ${r.effort}</div>` : ''}<div class="routine-trigger">⏰ ${r.trigger}</div><div class="days-grid ${currentFilter === 'today' ? '' : (days.length === 7 ? 'seven-days' : (days.length === 6 ? 'six-days' : (days.length === 2 ? 'weekend-only' : '')))}">${dHtml}</div></div>`;
+            // [수정] instruction 렌더링 코드 추가
+            return `<div class="routine-card">
+                <div class="routine-header">
+                    <span class="routine-emoji">${r.emoji}</span>
+                    <span class="routine-name">${r.name}</span>
+                </div>
+                ${r.effort ? `<div class="effort-guide">⭕ ${r.effort}</div>` : ''}
+                <div class="routine-trigger">⏰ ${r.trigger}</div>
+                ${r.instruction ? `<div class="routine-note">💡 ${r.instruction}</div>` : ''}
+                <div class="days-grid ${currentFilter === 'today' ? '' : (days.length === 7 ? 'seven-days' : (days.length === 6 ? 'six-days' : (days.length === 2 ? 'weekend-only' : '')))}">${dHtml}</div>
+            </div>`;
         }
 
         function updateBadge() {
