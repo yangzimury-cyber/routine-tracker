@@ -103,16 +103,17 @@
         const todayIdx = (new Date().getDay() + 6) % 7;
         const todayName = fullWeekList[todayIdx];
 
+        // 모든 항목에 allowSick: true를 적용했습니다.
         const routineData = {
-            morning: [{ id: 'english', name: '영어도서관 30분', emoji: '📚', trigger: '아침밥 먹으면서', effort: '집중해서 10분만 들어도 OK!' }],
+            morning: [{ id: 'english', name: '영어도서관 30분', emoji: '📚', trigger: '아침밥 먹으면서', effort: '집중해서 10분만 들어도 OK!', allowSick: true }],
             afternoon: [
-                { id: 'backpack', name: '책가방 비우기', emoji: '🎒', trigger: '학교 다녀와서 곧장' },
-                { id: 'math', name: '핀란드 수학 교과서', emoji: '🔢', trigger: '하교 후 간식 먹으면서', offDays: [4] },
-                { id: 'mathreview', name: '학교 수학 복습', emoji: '📐', trigger: '간식 시간 활용', offDays: [0, 1, 2, 3] },
-                { id: 'ort', name: '집중듣기 30분', emoji: '🎧', trigger: '수학 끝나면', offDays: [4] },
-                { id: 'hanja', name: '한자 2페이지', emoji: '✍️', trigger: '집중듣기 끝나면', offDays: [1, 3] },
-                { id: 'reading_weekday', name: '자유 선택 독서', emoji: '📖', trigger: '평일 오후 읽고 싶은 책 꺼내기', weekdayOnly: true },
-                { id: 'reading_weekend', name: '주말 고정 독서', emoji: '📕', trigger: '토~일 이야기책 읽기', weekendOnly: true },
+                { id: 'backpack', name: '책가방 비우기', emoji: '🎒', trigger: '학교 다녀와서 곧장', allowSick: true },
+                { id: 'math', name: '핀란드 수학 교과서', emoji: '🔢', trigger: '하교 후 간식 먹으면서', offDays: [4], allowSick: true },
+                { id: 'mathreview', name: '학교 수학 복습', emoji: '📐', trigger: '간식 시간 활용', offDays: [0, 1, 2, 3], allowSick: true },
+                { id: 'ort', name: '집중듣기 30분', emoji: '🎧', trigger: '수학 끝나면', offDays: [4], allowSick: true },
+                { id: 'hanja', name: '한자 2페이지', emoji: '✍️', trigger: '집중듣기 끝나면', offDays: [1, 3], allowSick: true },
+                { id: 'reading_weekday', name: '자유 선택 독서', emoji: '📖', trigger: '평일 오후 읽고 싶은 책 꺼내기', weekdayOnly: true, allowSick: true },
+                { id: 'reading_weekend', name: '주말 고정 독서', emoji: '📕', trigger: '토~일 이야기책 읽기', weekendOnly: true, allowSick: true },
                 { id: 'ringfit', name: '운동 (러닝/링핏)', emoji: '🏃', trigger: '식후 한 시간 뒤', weekendEnabled: true, allowSick: true }
             ]
         };
@@ -141,6 +142,8 @@
         function toggle(id, d, allowSick) {
             const key = id + '-' + d;
             const s = data.routines[key] || 'empty';
+            
+            // 상태 전환: 비어있음 -> 완료(체크) -> 노력함(세모/동그라미) -> 아파요(🤒) -> 다시 비어있음
             if (s === 'empty') data.routines[key] = 'checked';
             else if (s === 'checked') data.routines[key] = 'circle';
             else if (s === 'circle' && allowSick) data.routines[key] = 'sick';
@@ -180,9 +183,13 @@
         }
 
         function sendWeeklyEmail() {
-            let greenCount = 0; let yellowCount = 0;
-            Object.values(data.routines).forEach(s => { if(s === 'checked') greenCount++; if(s === 'circle') yellowCount++; });
-            const body = `이번 주 루틴 결과입니다!\n\n✅ 초록 체크: ${greenCount}개\n⭕ 노란 동그라미: ${yellowCount}개\n\n💭 한 마디:\n쉬웠던 것: ${data.weekly.easy || '-'}\n힘들었던 것: ${data.weekly.hard || '-'}\n내일 작전: ${data.weekly.plan || '-'}`;
+            let greenCount = 0; let yellowCount = 0; let sickCount = 0;
+            Object.values(data.routines).forEach(s => { 
+                if(s === 'checked') greenCount++; 
+                if(s === 'circle') yellowCount++;
+                if(s === 'sick') sickCount++;
+            });
+            const body = `이번 주 루틴 결과입니다!\n\n✅ 초록 체크: ${greenCount}개\n⭕ 노란 동그라미: ${yellowCount}개\n🤒 아파요: ${sickCount}개\n\n💭 한 마디:\n쉬웠던 것: ${data.weekly.easy || '-'}\n힘들었던 것: ${data.weekly.hard || '-'}\n내일 작전: ${data.weekly.plan || '-'}`;
             window.location.href = `mailto:?subject=[루틴표] 이번 주 기록&body=${encodeURIComponent(body)}`;
         }
 
