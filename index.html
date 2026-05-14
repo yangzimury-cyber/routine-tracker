@@ -49,6 +49,8 @@
         .email-btn { background: #2196f3; }
         .reset-btn { background: none; border: none; color: #999; text-decoration: underline; font-size: 12px; width: 100%; cursor: pointer; margin-top: 20px; }
         .popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); color: white; padding: 20px 30px; border-radius: 50px; display: none; z-index: 2000; text-align: center; font-weight: bold; border: 2px solid #fff; }
+        /* 오늘 강조 스타일 */
+        .day-box.is-today .day-label { color: #5e35b1; font-weight: bold; text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -103,7 +105,6 @@
         const todayIdx = (new Date().getDay() + 6) % 7;
         const todayName = fullWeekList[todayIdx];
 
-        // 모든 항목에 allowSick: true를 적용했습니다.
         const routineData = {
             morning: [{ id: 'english', name: '영어도서관 30분', emoji: '📚', trigger: '아침밥 먹으면서', effort: '집중해서 10분만 들어도 OK!', allowSick: true }],
             afternoon: [
@@ -142,8 +143,6 @@
         function toggle(id, d, allowSick) {
             const key = id + '-' + d;
             const s = data.routines[key] || 'empty';
-            
-            // 상태 전환: 비어있음 -> 완료(체크) -> 노력함(세모/동그라미) -> 아파요(🤒) -> 다시 비어있음
             if (s === 'empty') data.routines[key] = 'checked';
             else if (s === 'checked') data.routines[key] = 'circle';
             else if (s === 'circle' && allowSick) data.routines[key] = 'sick';
@@ -161,17 +160,28 @@
         function showPopup(m) { const p = document.getElementById('popup'); p.textContent = m; p.style.display = 'block'; setTimeout(() => p.style.display = 'none', 2000); }
 
         function createCard(r) {
+            // 해당 루틴이 수행되는 요일 목록 정의
             let days = r.weekendEnabled ? fullWeekList : (r.weekdayOnly ? weekdayList : (r.weekendOnly ? weekendList : weekdayList));
+            
+            // [수정 핵심] '오늘만 집중' 필터가 켜져있을 때, 오늘이 루틴 요일에 포함되지 않으면 아예 그리지 않음
             if (currentFilter === 'today' && !days.includes(todayName)) return '';
+
             let dHtml = '';
-            days.forEach((d) => {
+            // '오늘만 집중'일 때는 오늘 날짜 하나만, 아닐 때는 전체 요일 표시
+            let displayDays = (currentFilter === 'today') ? [todayName] : days;
+
+            displayDays.forEach((d) => {
                 const state = data.routines[r.id + '-' + d] || 'empty';
                 const isOff = r.offDays?.includes(fullWeekList.indexOf(d));
                 dHtml += `<div class="day-box ${d === todayName ? 'is-today' : ''}"><div class="day-label">${d}</div><button class="day-btn ${isOff ? 'off' : state}" ${isOff ? 'disabled' : `onclick="toggle('${r.id}','${d}', ${r.allowSick})"`}>
                     ${state === 'checked' ? '<svg class="checkmark" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>' : state === 'circle' ? '<div class="circle-icon"></div>' : state === 'sick' ? '🤒' : (isOff ? 'OFF' : '')}
                 </button></div>`;
             });
-            return `<div class="routine-card"><div class="routine-header"><span class="routine-emoji">${r.emoji}</span><span class="routine-name">${r.name}</span></div>${r.effort ? `<div class="effort-guide">⭕ ${r.effort}</div>` : ''}<div class="routine-trigger">⏰ ${r.trigger}</div><div class="days-grid ${days.length === 7 ? 'seven-days' : (days.length === 2 ? 'weekend-only' : '')}">${dHtml}</div></div>`;
+
+            // 오늘 날짜인데 OFF인 경우(예: 금요일인데 금요일이 OFF인 루틴)도 필터링에서 제외하려면 아래 조건 추가
+            if (currentFilter === 'today' && r.offDays?.includes(todayIdx)) return '';
+
+            return `<div class="routine-card"><div class="routine-header"><span class="routine-emoji">${r.emoji}</span><span class="routine-name">${r.name}</span></div>${r.effort ? `<div class="effort-guide">⭕ ${r.effort}</div>` : ''}<div class="routine-trigger">⏰ ${r.trigger}</div><div class="days-grid ${currentFilter === 'today' ? '' : (days.length === 7 ? 'seven-days' : (days.length === 2 ? 'weekend-only' : ''))}">${dHtml}</div></div>`;
         }
 
         function updateBadge() {
@@ -200,14 +210,32 @@
             }
         }
 
-        function setFilter(f) { currentFilter = f; document.getElementById('viewAll').classList.toggle('active', f === 'all'); document.getElementById('viewToday').classList.toggle('active', f === 'today'); document.getElementById('weekendSection').style.display = (f === 'today' && todayIdx < 5) ? 'none' : 'flex'; render(); }
+        function setFilter(f) { 
+            currentFilter = f; 
+            document.getElementById('viewAll').classList.toggle('active', f === 'all'); 
+            document.getElementById('viewToday').classList.toggle('active', f === 'today'); 
+            
+            // 오늘이 주말이 아닐 때 '오늘만 집중'을 누르면 주말 섹션 숨기기
+            const isWeekend = todayIdx >= 5; // 5: 토요일, 6: 일요일
+            document.getElementById('weekendSection').style.display = (f === 'today' && !isWeekend) ? 'none' : 'flex'; 
+            render(); 
+        }
+
         function toggleSat(a) { const i = data.weekend.indexOf(a); if(i > -1) data.weekend.splice(i, 1); else if(data.weekend.length < 2) { data.weekend.push(a); createConfetti(); } save(); render(); }
         function setBridge(b) { data.bridge = data.bridge === b ? '' : b; if(data.bridge) createConfetti(); save(); render(); }
         function saveReflection() { data.weekly = { easy: document.getElementById('weeklyEasy').value, hard: document.getElementById('weeklyHard').value, plan: document.getElementById('weeklyPlan').value }; save(); alert('저장 완료!'); }
 
         function render() {
-            document.getElementById('morningRoutines').innerHTML = routineData.morning.map(createCard).join('');
-            document.getElementById('afternoonRoutines').innerHTML = routineData.afternoon.map(createCard).join('');
+            const morningHtml = routineData.morning.map(createCard).join('');
+            const afternoonHtml = routineData.afternoon.map(createCard).join('');
+            
+            document.getElementById('morningRoutines').innerHTML = morningHtml;
+            document.getElementById('afternoonRoutines').innerHTML = afternoonHtml;
+            
+            // 섹션 헤더 숨기기 처리 (해당 시간대에 루틴이 하나도 없으면 헤더도 숨김)
+            document.querySelector('.section-header.morning').style.display = morningHtml === '' ? 'none' : 'inline-block';
+            document.querySelector('.section-header.afternoon').style.display = afternoonHtml === '' ? 'none' : 'inline-block';
+
             document.getElementById('saturdayActivities').innerHTML = satItems.map(a => `<button class="activity-btn ${data.weekend.includes(a) ? 'selected' : ''}" onclick="toggleSat('${a}')">${a}</button>`).join('');
             document.getElementById('sundayBridges').innerHTML = sunItems.map(b => `<button class="activity-btn bridge-btn ${data.bridge === b ? 'selected' : ''}" onclick="setBridge('${b}')">${b}</button>`).join('');
             updateBadge();
