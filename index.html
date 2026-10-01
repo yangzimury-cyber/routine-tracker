@@ -169,7 +169,6 @@
             transition: all 0.2s ease;
         }
         .activity-btn.selected { background: #ec407a; color: white; border-color: #ec407a; }
-        .bridge-btn.selected { background: #5e35b1; color: white; border-color: #5e35b1; }
         
         /* 성장 기록 및 입력창 */
         .badge-container { display: flex; flex-direction: column; align-items: center; padding: 16px; background: #f1f8e9; border-radius: 12px; margin-bottom: 14px; border: 1px dashed #81c784; }
@@ -277,12 +276,10 @@
             <div class="right-sidebar">
                 <div class="weekend-wrapper" id="weekendSection">
                     <div class="card" style="border-left: 5px solid #ec407a;">
-                        <h2>✨ 토요일 특별 활동</h2>
+                        <h2>✨ 주말 특별 활동</h2>
                         <div id="saturdayActivities"></div>
-                    </div>
-                    <div class="card" style="border-left: 5px solid #5e35b1;">
-                        <h2>🌉 일요일 브릿지</h2>
-                        <div id="sundayBridges"></div>
+                        <label for="weekendWish">💭 우리 아이 희망사항</label>
+                        <input type="text" id="weekendWish" placeholder="예: 키즈카페 가고 싶어요" oninput="data.weekendWish = this.value; save();">
                     </div>
                 </div>
 
@@ -339,20 +336,19 @@
                 { id: 'english', group: 'eng', name: '영어도서관 30분', emoji: '📚', trigger: '아침밥 먹으면서', effort: '집중해서 10분만 들어도 OK!', allowSick: true },
                 { id: 'english_read_along', group: 'eng', name: '영어 따라 읽기', emoji: '🗣️', weekdayOnly: true, allowSick: true },
                 { id: 'talkstation', group: 'talk', name: '토크스테이션 과제하기', emoji: '🎤', customDays: ['1회', '2회'], activeDays: ['화', '목', '금'], daysNote: '화/목/금', allowSick: true },
-                { id: 'notes_check', group: 'talk', name: '영어수업노트 체크!', emoji: '📓', customDays: ['화', '목', '금', '주말'], isSixDay: true, allowSick: true }
+                { id: 'notes_check', group: 'talk', name: '영어수업노트 체크+주말 복습', emoji: '📓', customDays: ['화', '목', '주말'], isSixDay: true, allowSick: true }
             ],
             afternoon: [
                 { id: 'math_all', name: '수학공부(핀란드수학/학교수학)', emoji: '🔢', isSixDay: true, allowSick: true },
                 { id: 'english_listening', group: 'eng2', name: '영어책 집중듣기', emoji: '🎧', instruction: '오늘 읽은 책에서 제일 마음에 드는 문장 하나만 적어줘', isSixDay: true, allowSick: true },
-                { id: 'english_write_sentence', group: 'eng2', name: '마음에 드는 문장 따라 쓰기', emoji: '✏️', weekdayOnly: true, allowSick: true },
-                { id: 'hanja', name: '한자 학습', emoji: '✍️', customDays: ['월', '수', '주말'], isSixDay: true, instruction: '학습지? 한자어책?', allowSick: true },
+                { id: 'english_write_sentence', group: 'eng2', name: '마음에 드는 문장 따라 쓰기', emoji: '✏️', isSixDay: true, allowSick: true },
+                { id: 'hanja', name: '한자 학습', emoji: '✍️', customDays: ['1회', '2회', '3회'], activeDays: ['월', '수', '금', '주말'], daysNote: '월/수/금/주말', isSixDay: true, instruction: '학습지? 한자어책?', allowSick: true },
                 { id: 'reading_combined', name: '독서 시간', emoji: '📖', trigger: '읽고 싶은 책 자유롭게 꺼내기', weekendEnabled: true, allowSick: true },
                 { id: 'ringfit', name: '운동 (러닝/링핏)', emoji: '🏃', trigger: '식후 한 시간 뒤', weekendEnabled: true, allowSick: true }
             ]
         };
 
         const satItems = ['보드게임 1판', '물감 그림 그리기', '만들기 활동', '도서관 방문', '가족 예능 보기'];
-        const sunItems = ['영어집중듣기', '수학 문제 1개만', '책 4페이지만 읽기'];
         
         const readingMsgs = ["책 속의 보물을 찾았구나! 💎", "생각의 주머니가 한 뼘 더 커졌네! 🎈", "멋진 독서가! 오늘 정말 훌륭해 📖"];
         const normalMsgs = ["대단해! 해냈구나! 🌟", "멋져! 끝까지 해냈어 👍", "최고야! 기분이 좋지? 😊"];
@@ -506,7 +502,6 @@
         }
 
         function toggleSat(a) { const i = data.weekend.indexOf(a); if(i > -1) data.weekend.splice(i, 1); else if(data.weekend.length < 2) { data.weekend.push(a); createConfetti(); } save(); render(); }
-        function setBridge(b) { data.bridge = data.bridge === b ? '' : b; if(data.bridge) createConfetti(); save(); render(); }
         function saveReflection() { data.weekly = { easy: document.getElementById('weeklyEasy').value, hard: document.getElementById('weeklyHard').value, plan: document.getElementById('weeklyPlan').value }; save(); alert('저장 완료!'); }
 
         /* [추가] 탭 전환 */
@@ -669,8 +664,8 @@
             document.querySelector('.section-header.morning').style.display = morningHtml === '' ? 'none' : 'inline-block';
             document.querySelector('.section-header.afternoon').style.display = afternoonHtml === '' ? 'none' : 'inline-block';
             document.getElementById('saturdayActivities').innerHTML = satItems.map(a => `<button class="activity-btn ${data.weekend.includes(a) ? 'selected' : ''}" onclick="toggleSat('${a}')">${a}</button>`).join('');
-            document.getElementById('sundayBridges').innerHTML = sunItems.map(b => `<button class="activity-btn bridge-btn ${data.bridge === b ? 'selected' : ''}" onclick="setBridge('${b}')">${b}</button>`).join('');
             
+            document.getElementById('weekendWish').value = data.weekendWish || '';
             if(data.weekly.easy) document.getElementById('weeklyEasy').value = data.weekly.easy;
             if(data.weekly.hard) document.getElementById('weeklyHard').value = data.weekly.hard;
             if(data.weekly.plan) document.getElementById('weeklyPlan').value = data.weekly.plan;
