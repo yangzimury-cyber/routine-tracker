@@ -55,6 +55,17 @@
         }
         .filter-btn.active { background: #5e35b1; color: white; }
 
+        /* [추가] 상단 탭 (루틴표 / 영어 수업노트) */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn {
+            flex: 1; padding: 14px; border: none; border-radius: 16px;
+            background: rgba(255,255,255,0.65); color: #5e35b1;
+            font-size: 16px; font-weight: 700; cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+        }
+        .tab-btn.active { background: #5e35b1; color: white; }
+        @media (max-width: 480px) { .tab-btn { font-size: 14px; padding: 12px 4px; } }
+
         /* 태블릿용 2열 대시보드 레이아웃 */
         .dashboard-grid {
             display: grid;
@@ -94,9 +105,13 @@
         
         /* 루틴 카드 */
         .routine-card { background: #f8f9fa; border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; border: 1px solid #eef0f2; }
+        .routine-card.group-talk { background: #ece4fa; border: 1px solid #b39ddb; border-left: 5px solid #7e57c2; }
+        .routine-card.group-eng2 { background: #dff3e4; border: 1px solid #a5d6a7; border-left: 5px solid #43a047; }
+        .routine-card.group-eng { background: #d6ebff; border: 1px solid #90caf9; border-left: 5px solid #1e88e5; }
         .routine-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
         .routine-emoji { font-size: 22px; }
         .routine-name { font-size: 15px; font-weight: 700; color: #333; }
+        .days-note { font-size: 12px; color: #777; font-weight: 600; }
         .effort-guide { font-size: 12px; color: #ff6f00; font-weight: 600; margin-left: 30px; margin-bottom: 4px; }
         .routine-trigger { font-size: 12px; color: #666; font-style: italic; margin-bottom: 4px; margin-left: 30px; }
         .routine-note { font-size: 12px; color: #555; margin-left: 30px; margin-bottom: 10px; line-height: 1.4; }
@@ -106,6 +121,7 @@
         .days-grid.seven-days { grid-template-columns: repeat(7, 1fr); }
         .days-grid.six-days { grid-template-columns: repeat(6, 1fr); }
         .days-grid.five-days { grid-template-columns: repeat(5, 1fr); }
+        .days-grid.four-days { grid-template-columns: repeat(4, 1fr); }
         .days-grid.three-days { grid-template-columns: repeat(3, 1fr); }
         .days-grid.weekend-only { grid-template-columns: repeat(2, 1fr); }
         
@@ -175,6 +191,50 @@
         /* 팝업 모달 */
         .popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); color: white; padding: 16px 28px; border-radius: 30px; display: none; z-index: 2000; text-align: center; font-weight: bold; font-size: 15px; border: 1px solid #fff; width: 80%; max-width: 360px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .day-box.is-today .day-label { color: #5e35b1; font-weight: bold; text-decoration: underline; }
+
+        /* [추가] 영어 수업노트 */
+        #notesView { max-width: 640px; margin: 0 auto; }
+        .notes-count { text-align: right; color: #666; font-size: 14px; margin-bottom: 10px; font-weight: 600; }
+        .lesson { background: white; border-radius: 20px; margin-bottom: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); overflow: hidden; }
+        .lesson summary { list-style: none; cursor: pointer; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+        .lesson summary::-webkit-details-marker { display: none; }
+        .lesson summary b { font-size: 18px; color: #333; display: block; }
+        .lesson summary small { color: #777; font-size: 13px; }
+        .lesson-body { padding: 0 20px 20px; }
+        .lesson-book { font-size: 13px; color: #777; margin-bottom: 4px; }
+        .lesson-body h3 { font-size: 16px; color: #5e35b1; margin: 18px 0 8px; }
+        .pat { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 12px 0; border-top: 1px dashed #e0e0e0; font-size: 17px; line-height: 1.5; }
+        .pat:first-of-type { border-top: none; }
+        .pat.done .pat-text { color: #2e7d32; }
+        .pat-text { flex: 1; }
+        .pat-check { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 13px; color: #777; white-space: nowrap; }
+        .pat-check input { width: 22px; height: 22px; accent-color: #2e7d32; }
+        /* [추가] 이번 주 복습 */
+        .review { background: white; border-radius: 20px; padding: 20px; margin-bottom: 22px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border-left: 5px solid #7e57c2; }
+        .review h2 { margin-bottom: 2px; }
+        .review .sub { font-size: 13px; color: #777; margin-bottom: 6px; }
+        .step-t { font-size: 16px; font-weight: 700; color: #5e35b1; margin: 18px 0 6px; display: flex; justify-content: space-between; }
+        .step-t small { color: #777; font-weight: 600; font-size: 13px; }
+        .wk-day { font-size: 13px; font-weight: 700; color: #7e57c2; margin-top: 8px; }
+        .notes-h { font-size: 17px; margin: 6px 0 12px; color: #333; }
+        .q-meta { font-size: 13px; color: #777; }
+        .q-was { margin: 8px 0 4px; font-size: 18px; font-weight: 600; color: #666; line-height: 1.5; }
+        .q-was .was { color: #707070; text-decoration: line-through; text-decoration-thickness: 2px; text-decoration-color: #e53935; }
+        .q-ask { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .q-ans { min-height: 68px; border: 2px dashed #b39ddb; border-radius: 14px; padding: 6px; margin: 10px 0; display: flex; flex-wrap: wrap; align-items: center; background: #fff; }
+        .q-ans.good { border: 2px solid #2e7d32; background: #e8f5e9; }
+        .q-ans.bad { border: 2px solid #e53935; animation: shake 0.4s; }
+        @keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+        .q-pool { display: flex; flex-wrap: wrap; }
+        .tile { font-size: 18px; font-weight: 600; padding: 10px 14px; margin: 4px; border-radius: 12px; border: 2px solid #b39ddb; background: #f3eefb; color: #333; cursor: pointer; }
+        .q-ans .tile { background: #fff; }
+        .q-ok { color: #2e7d32; font-weight: 700; margin: 6px 0; }
+        .q-no { color: #e53935; font-size: 14px; margin: 6px 0; }
+        .mini { padding: 9px 16px; border-radius: 999px; border: 2px solid #5e35b1; background: #fff; color: #5e35b1; font-weight: 700; font-size: 14px; cursor: pointer; margin: 6px 6px 0 0; }
+        .mini.go { background: #5e35b1; color: #fff; }
+        .fix { background: #f3eefb; border-radius: 12px; padding: 10px 14px; margin-bottom: 8px; line-height: 1.5; }
+        .fix .was { color: #888; text-decoration: line-through; text-decoration-color: #e53935; font-size: 14px; }
+        .fix .now { color: #2e7d32; font-weight: 700; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -187,12 +247,21 @@
                 <h1>⭐ 우리 아이 주간 루틴표</h1>
                 <div class="subtitle">"오늘의 작은 발걸음이 내일의 큰 꿈이 될 거야!"</div>
             </div>
-            <div class="filter-container">
+            <div class="filter-container" id="filterBox">
                 <button id="viewAll" class="filter-btn active" onclick="setFilter('all')">전체 루틴</button>
                 <button id="viewToday" class="filter-btn" onclick="setFilter('today')">오늘만 집중</button>
             </div>
         </div>
 
+        <!-- [추가] 탭 -->
+        <div class="tabs">
+            <button id="tabRoutine" class="tab-btn active" onclick="showTab('routine')">📅 루틴표</button>
+            <button id="tabNotes" class="tab-btn" onclick="showTab('notes')">📖 영어 수업노트</button>
+            <button id="tabReview" class="tab-btn" onclick="showTab('review')">🎯 이번 주 복습</button>
+        </div>
+
+        <!-- 루틴표 화면 (기존 내용 전체를 이 div 안에 넣었어요) -->
+        <div id="routineView">
         <!-- 대시보드 2열 레이아웃 -->
         <div class="dashboard-grid">
             <!-- 좌측: 아침 & 오후 루틴 -->
@@ -240,6 +309,18 @@
                 </div>
             </div>
         </div>
+        </div>
+
+        <!-- [추가] 영어 수업노트 화면 -->
+        <div id="notesView" style="display:none">
+            <div class="notes-count" id="notesCount"></div>
+            <div id="lessonList"></div>
+        </div>
+
+        <!-- [추가] 이번 주 복습 화면 -->
+        <div id="reviewView" style="display:none">
+            <div id="weekReview"></div>
+        </div>
     </div>
 
     <script>
@@ -255,15 +336,16 @@
 
         const routineData = {
             morning: [
-                { id: 'english', name: '영어도서관 30분', emoji: '📚', trigger: '아침밥 먹으면서', effort: '집중해서 10분만 들어도 OK!', allowSick: true },
-                { id: 'english_read_along', name: '영어 따라 읽기', emoji: '🗣️', weekdayOnly: true, allowSick: true },
-                { id: 'math_all', name: '수학공부(핀란드/학교/달콤)', emoji: '🔢', trigger: '오전 공부 시간', weekendEnabled: true, allowSick: true },
-                { id: 'ai_english_talk', name: 'AI와 영어로 대화하기', emoji: '🤖', weekdayOnly: true, allowSick: true }
+                { id: 'english', group: 'eng', name: '영어도서관 30분', emoji: '📚', trigger: '아침밥 먹으면서', effort: '집중해서 10분만 들어도 OK!', allowSick: true },
+                { id: 'english_read_along', group: 'eng', name: '영어 따라 읽기', emoji: '🗣️', weekdayOnly: true, allowSick: true },
+                { id: 'talkstation', group: 'talk', name: '토크스테이션 과제하기', emoji: '🎤', customDays: ['1회', '2회'], activeDays: ['화', '목', '금'], daysNote: '화/목/금', allowSick: true },
+                { id: 'notes_check', group: 'talk', name: '영어수업노트 체크!', emoji: '📓', customDays: ['화', '목', '금', '주말'], isSixDay: true, allowSick: true }
             ],
             afternoon: [
-                { id: 'hanja', name: '한자 학습', emoji: '✍️', customDays: hanjaList, instruction: '학습지? 한자어책?', allowSick: true },
-                { id: 'english_listening', name: '영어책 집중듣기', emoji: '🎧', instruction: '오늘 읽은 책에서 제일 마음에 드는 문장 하나만 적어줘', isSixDay: true, allowSick: true },
-                { id: 'english_write_sentence', name: '마음에 드는 문장 따라 쓰기', emoji: '✏️', weekdayOnly: true, allowSick: true },
+                { id: 'math_all', name: '수학공부(핀란드수학/학교수학)', emoji: '🔢', isSixDay: true, allowSick: true },
+                { id: 'english_listening', group: 'eng2', name: '영어책 집중듣기', emoji: '🎧', instruction: '오늘 읽은 책에서 제일 마음에 드는 문장 하나만 적어줘', isSixDay: true, allowSick: true },
+                { id: 'english_write_sentence', group: 'eng2', name: '마음에 드는 문장 따라 쓰기', emoji: '✏️', weekdayOnly: true, allowSick: true },
+                { id: 'hanja', name: '한자 학습', emoji: '✍️', customDays: ['월', '수', '주말'], isSixDay: true, instruction: '학습지? 한자어책?', allowSick: true },
                 { id: 'reading_combined', name: '독서 시간', emoji: '📖', trigger: '읽고 싶은 책 자유롭게 꺼내기', weekendEnabled: true, allowSick: true },
                 { id: 'ringfit', name: '운동 (러닝/링핏)', emoji: '🏃', trigger: '식후 한 시간 뒤', weekendEnabled: true, allowSick: true }
             ]
@@ -276,8 +358,51 @@
         const normalMsgs = ["대단해! 해냈구나! 🌟", "멋져! 끝까지 해냈어 👍", "최고야! 기분이 좋지? 😊"];
         const sickMsg = ["오늘은 푹 쉬고 빨리 나으자! 💊", "충분한 휴식도 성장의 일부야 🛌"];
 
+        /* ============================================================
+           [추가] 영어 수업노트 데이터
+           수업이 끝나면 아래 lessons 안에 { ... } 한 덩어리를 추가하면 돼요.
+           (날짜 date 기준으로 최신 수업이 자동으로 맨 위에 나와요)
+           ============================================================ */
+        const lessons = [
+            {
+                date: '2026-09-30', label: '9월 30일 수요일', time: '14:30~14:54', teacher: 'Nicole',
+                book: 'GL3 - The Three Axes (Finish)',
+                pron: '',   /* 발음 교정이 있으면 여기에 적기. 비워두면 "고칠 발음 없음" 표시 */
+                fixes: [
+                    ['a very short pencil.', 'I have a very short pencil that I really like for a long time.'],
+                    ['smell and story', 'I like the smell of old things and the story behind them.']
+                ],
+                patterns: [
+                    'My old sketchbook is very old and I like old things.',
+                    'I think he will use the axe for chopping trees.',
+                    "I think he'll buy fruits and maybe buy a house.",
+                    'Do you think he did the right thing?',
+                    "Yes, I do. It's because he helped other people.",
+                    'I will buy food and help others.'
+                ]
+            },
+            {
+                date: '2026-09-28', label: '9월 28일 월요일', time: '14:30', teacher: 'Nicole',
+                book: 'The Three Axes',
+                pron: '',
+                fixes: [
+                    ['chopping trees.', 'An axe is used for chopping trees.'],
+                    ["I think the mountain god will got the man's axe back.", "I think the mountain god will get the man's axe back."]
+                ],
+                patterns: [
+                    'What do you think the poor man will do?',
+                    'I think he wanted his axe back.',
+                    'He will jump into the lake.',
+                    'No, because I like the old axe more than the gold one.'
+                ]
+            }
+        ];
+
         let data = JSON.parse(localStorage.getItem('routineData')) || { routines: {}, weekend: [], bridge: '', weekly: {} };
         let currentFilter = 'all';
+        /* 수업노트 "읽었어요" 기록은 주간 초기화에 지워지지 않도록 따로 저장 */
+        let notesDone = {};
+        try { notesDone = JSON.parse(localStorage.getItem('notesDone')) || {}; } catch (e) {}
 
         function createConfetti() {
             for (let i = 0; i < 30; i++) {
@@ -313,10 +438,10 @@
         function createCard(r) {
             let days = r.customDays ? r.customDays : (r.weekendEnabled ? fullWeekList : (r.weekdayOnly ? weekdayList : (r.weekendOnly ? weekendList : (r.isSixDay ? sixDayList : weekdayList))));
             let currentCheckLabel = r.isSixDay ? todayLabel : todayName;
-            if (currentFilter === 'today' && !days.includes(currentCheckLabel)) return '';
+            if (currentFilter === 'today' && !(r.activeDays || days).includes(currentCheckLabel)) return '';
             
             let dHtml = '';
-            let displayDays = (currentFilter === 'today') ? [currentCheckLabel] : days;
+            let displayDays = (currentFilter === 'today' && !r.activeDays) ? [currentCheckLabel] : days;
 
             displayDays.forEach((d) => {
                 const state = data.routines[r.id + '-' + d] || 'empty';
@@ -331,12 +456,12 @@
 
             if (currentFilter === 'today' && !r.isSixDay && r.offDays?.includes(todayIdx)) return '';
 
-            let gridClass = currentFilter === 'today' ? '' : (days.length === 7 ? 'seven-days' : (days.length === 6 ? 'six-days' : (days.length === 3 ? 'three-days' : (days.length === 2 ? 'weekend-only' : 'five-days'))));
+            let gridClass = (currentFilter === 'today' && !r.activeDays) ? '' : (days.length === 7 ? 'seven-days' : (days.length === 6 ? 'six-days' : (days.length === 4 ? 'four-days' : (days.length === 3 ? 'three-days' : (days.length === 2 ? 'weekend-only' : 'five-days')))));
 
-            return `<div class="routine-card">
+            return `<div class="routine-card ${r.group ? 'group-' + r.group : ''}">
                 <div class="routine-header">
                     <span class="routine-emoji">${r.emoji}</span>
-                    <span class="routine-name">${r.name}</span>
+                    <span class="routine-name">${r.name}</span>${r.daysNote ? `<span class="days-note">${r.daysNote}</span>` : ''}
                 </div>
                 ${r.effort ? `<div class="effort-guide">⭕ ${r.effort}</div>` : ''}
                 ${r.trigger ? `<div class="routine-trigger">⏰ ${r.trigger}</div>` : ''}
@@ -383,6 +508,158 @@
         function toggleSat(a) { const i = data.weekend.indexOf(a); if(i > -1) data.weekend.splice(i, 1); else if(data.weekend.length < 2) { data.weekend.push(a); createConfetti(); } save(); render(); }
         function setBridge(b) { data.bridge = data.bridge === b ? '' : b; if(data.bridge) createConfetti(); save(); render(); }
         function saveReflection() { data.weekly = { easy: document.getElementById('weeklyEasy').value, hard: document.getElementById('weeklyHard').value, plan: document.getElementById('weeklyPlan').value }; save(); alert('저장 완료!'); }
+
+        /* [추가] 탭 전환 */
+        function showTab(t) {
+            const n = t === 'notes', r = t === 'review';
+            document.getElementById('routineView').style.display = (n || r) ? 'none' : 'block';
+            document.getElementById('notesView').style.display = n ? 'block' : 'none';
+            document.getElementById('reviewView').style.display = r ? 'block' : 'none';
+            document.getElementById('filterBox').style.display = (n || r) ? 'none' : 'flex';
+            document.getElementById('tabRoutine').classList.toggle('active', !n && !r);
+            document.getElementById('tabNotes').classList.toggle('active', n);
+            document.getElementById('tabReview').classList.toggle('active', r);
+            if (n) renderNotes();
+            if (r) renderWeekReview();
+        }
+
+        /* [추가] 영어 수업노트 */
+        function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+        function updateNotesCount() {
+            let total = 0, read = 0;
+            lessons.forEach(l => l.patterns.forEach((p, j) => { total++; if (notesDone[l.date + '-' + j]) read++; }));
+            document.getElementById('notesCount').textContent = '읽은 문장 ' + read + ' / ' + total;
+            updateWkCount();
+        }
+        function saveNotes() { try { localStorage.setItem('notesDone', JSON.stringify(notesDone)); } catch (e) {} }
+        function toggleNote(key, checked) {
+            notesDone[key] = checked; saveNotes();
+            /* 이번 주 복습 영역과 수업 카드에 같은 문장이 있으면 함께 체크 */
+            document.querySelectorAll('input[data-key="' + key + '"]').forEach(i => {
+                i.checked = checked; i.closest('.pat').classList.toggle('done', checked);
+            });
+            if (checked) createConfetti();
+            updateNotesCount();
+        }
+        function renderNotes() {
+            const sorted = [...lessons].sort((a, b) => b.date.localeCompare(a.date));
+            document.getElementById('lessonList').innerHTML = sorted.map((l, i) => `
+                <details class="lesson" ${i === 0 ? 'open' : ''}>
+                    <summary><span><b>${esc(l.label)}</b><small>Teacher ${esc(l.teacher)} · ${esc(l.time)}</small></span><span aria-hidden="true">▾</span></summary>
+                    <div class="lesson-body">
+                        <div class="lesson-book">📖 ${esc(l.book)}</div>
+                        <h3>🗣️ 오늘 배운 말</h3>
+                        ${l.patterns.map((p, j) => {
+                            const key = l.date + '-' + j;
+                            return `<div class="pat ${notesDone[key] ? 'done' : ''}">
+                                <div class="pat-text">${esc(p)}</div>
+                                <label class="pat-check"><input type="checkbox" ${notesDone[key] ? 'checked' : ''} data-key="${key}" onchange="toggleNote('${key}', this.checked)">읽었어요</label>
+                            </div>`;
+                        }).join('')}
+                        <h3>✏️ 이렇게 말하면 더 좋아요</h3>
+                        ${l.fixes.map(f => `<div class="fix"><div class="was">${esc(f[0])}</div><div class="now">${esc(f[1])}</div></div>`).join('')}
+                        <h3>🎧 발음</h3>
+                        <p>${l.pron ? esc(l.pron) : '고칠 발음이 없었어요. 잘했어요! 🎉'}</p>
+                    </div>
+                </details>`).join('');
+            updateNotesCount();
+        }
+
+        /* [추가] 이번 주 복습: 가장 최근 수업이 있는 주의 수업들을 합쳐서 복습 */
+        const ymd = d => d.split('-').map(Number);
+        const dayK = d => { const [y, m, dd] = ymd(d); return '일월화수목금토'[new Date(y, m - 1, dd).getDay()]; };
+        const mdTxt = d => { const [, m, dd] = ymd(d); return m + '/' + dd; };
+        function weekKey(d) { const [y, m, dd] = ymd(d); const t = new Date(y, m - 1, dd); t.setDate(t.getDate() - ((t.getDay() + 6) % 7)); return t.getFullYear() + '-' + (t.getMonth() + 1) + '-' + t.getDate(); }
+        function weekLessons() {
+            if (!lessons.length) return [];
+            const latest = [...lessons].sort((a, b) => b.date.localeCompare(a.date))[0];
+            return lessons.filter(l => weekKey(l.date) === weekKey(latest.date)).sort((a, b) => a.date.localeCompare(b.date));
+        }
+        function updateWkCount() {
+            const el = document.getElementById('wkCount'); if (!el) return;
+            let t = 0, r = 0;
+            weekLessons().forEach(l => l.patterns.forEach((p, j) => { t++; if (notesDone[l.date + '-' + j]) r++; }));
+            el.textContent = r + ' / ' + t;
+        }
+
+        /* 고친 문장 퀴즈 (단어 카드 재조합) */
+        let Q = { sig: '', items: [], i: 0, toks: [], order: [], ans: [], celebrated: false };
+        function qItems() {
+            const out = [];
+            weekLessons().forEach(l => l.fixes.forEach((f, k) => out.push({ key: 'q:' + l.date + '-' + k, was: f[0], now: f[1] })));
+            return out;
+        }
+        function qStart(i) {
+            Q.i = i; Q.celebrated = false; Q.ans = [];
+            Q.toks = Q.items[i].now.split(' ');
+            let o = Q.toks.map((_, x) => x);
+            for (let t = 0; t < 8; t++) { o.sort(() => Math.random() - 0.5); if (o.map(x => Q.toks[x]).join(' ') !== Q.items[i].now) break; }
+            Q.order = o;
+            renderQuiz();
+        }
+        function qCheck() {
+            const it = Q.items[Q.i];
+            if (Q.ans.length === Q.toks.length && Q.ans.map(id => Q.toks[id]).join(' ') === it.now && !Q.celebrated) {
+                Q.celebrated = true; notesDone[it.key] = true; saveNotes(); createConfetti();
+            }
+        }
+        function qPick(id) { Q.ans.push(id); qCheck(); renderQuiz(); }
+        function qBack(id) { Q.ans = Q.ans.filter(x => x !== id); renderQuiz(); }
+        function qReset() { Q.ans = []; renderQuiz(); }
+        function qHint() {
+            const cur = Q.ans.map(id => Q.toks[id]); let k = 0;
+            while (k < cur.length && cur[k] === Q.toks[k]) k++;
+            Q.ans = Q.ans.slice(0, k);
+            const id = Q.order.find(x => !Q.ans.includes(x) && Q.toks[x] === Q.toks[k]);
+            if (id !== undefined) Q.ans.push(id);
+            qCheck(); renderQuiz();
+        }
+        function renderQuiz() {
+            const box = document.getElementById('quizBox'); if (!box) return;
+            if (!Q.items.length) { box.innerHTML = '<p>이번 주에는 고칠 문장이 없었어요. 잘했어요! 🎉</p>'; return; }
+            const it = Q.items[Q.i], toks = Q.toks;
+            const full = Q.ans.length === toks.length;
+            const ok = full && Q.ans.map(id => toks[id]).join(' ') === it.now;
+            const pool = Q.order.filter(id => !Q.ans.includes(id));
+            const solved = Q.items.filter(x => notesDone[x.key]).length;
+            const last = Q.i === Q.items.length - 1;
+            box.innerHTML = `
+                <div class="q-meta">문제 ${Q.i + 1} / ${Q.items.length} · 맞힌 문제 ${solved}</div>
+                <div class="q-was">처음엔 이렇게 말했어요 → <span class="was">${esc(it.was)}</span></div>
+                <div class="q-ask">단어를 눌러서 바르게 고쳐 말해볼까요?</div>
+                <div class="q-ans ${ok ? 'good' : (full ? 'bad' : '')}">${Q.ans.map(id => `<button class="tile" ${ok ? 'disabled' : ''} onclick="qBack(${id})">${esc(toks[id])}</button>`).join('')}</div>
+                <div class="q-pool">${pool.map(id => `<button class="tile" onclick="qPick(${id})">${esc(toks[id])}</button>`).join('')}</div>
+                ${ok ? '<div class="q-ok">🎉 정답이에요! 이렇게 말하면 더 좋아요</div>' : ''}
+                ${full && !ok ? '<div class="q-no">앗, 순서가 조금 달라요. 단어를 눌러 빼고 다시 해봐요!</div>' : ''}
+                <div>
+                    ${!ok ? '<button class="mini" onclick="qHint()">💡 힌트</button><button class="mini" onclick="qReset()">↺ 다시</button>' : ''}
+                    ${ok ? `<button class="mini go" onclick="qStart(${last ? 0 : Q.i + 1})">${last ? '처음부터 다시 ↺' : '다음 문제 ▶'}</button>` : ''}
+                </div>`;
+        }
+        function renderWeekReview() {
+            const el = document.getElementById('weekReview');
+            const wl = weekLessons();
+            if (!wl.length) { el.innerHTML = '<div class="review"><p>아직 수업 기록이 없어요.</p></div>'; return; }
+            const range = wl.map(l => dayK(l.date) + ' ' + mdTxt(l.date)).join(' · ');
+            el.innerHTML = `<div class="review">
+                <h2>🎯 이번 주 복습</h2>
+                <div class="sub">${esc(range)} 수업을 한 번에 복습해요</div>
+                <div class="step-t"><span>① 이번 주 말 읽어보기</span><small>읽은 문장 <span id="wkCount"></span></small></div>
+                ${wl.map(l => `<div class="wk-day">${dayK(l.date)}요일 수업 (${mdTxt(l.date)})</div>` + l.patterns.map((p, j) => {
+                    const key = l.date + '-' + j;
+                    return `<div class="pat ${notesDone[key] ? 'done' : ''}">
+                        <div class="pat-text">${esc(p)}</div>
+                        <label class="pat-check"><input type="checkbox" ${notesDone[key] ? 'checked' : ''} data-key="${key}" onchange="toggleNote('${key}', this.checked)">읽었어요</label>
+                    </div>`;
+                }).join('')).join('')}
+                <div class="step-t"><span>② 고친 문장 퀴즈</span></div>
+                <div id="quizBox"></div>
+            </div>`;
+            updateWkCount();
+            const items = qItems(), sig = items.map(x => x.key).join('|');
+            if (sig !== Q.sig) { Q.sig = sig; Q.items = items; if (items.length) { qStart(0); return; } }
+            renderQuiz();
+        }
 
         function render() {
             const morningHtml = routineData.morning.map(createCard).join('');
