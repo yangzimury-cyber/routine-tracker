@@ -99,7 +99,6 @@
         .routine-card.group-talk { background: #ece4fa; border: 1px solid #b39ddb; border-left: 5px solid #7e57c2; }
         .routine-card.group-eng2 { background: #dff3e4; border: 1px solid #a5d6a7; border-left: 5px solid #43a047; }
         .routine-card.group-eng { background: #d6ebff; border: 1px solid #90caf9; border-left: 5px solid #1e88e5; }
-        /* [추가] 수학 전용 통일 테마 색상 (오전/오후 수학 공통) */
         .routine-card.group-math { background: #f1f8e9; border: 1px solid #c8e6c9; border-left: 5px solid #2e7d32; }
 
         .routine-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
@@ -324,6 +323,7 @@
         const routineData = {
             morning: [
                 { id: 'english_morning', group: 'eng', name: '오전 영어 집중듣기 (30분)', emoji: '🎧', trigger: '07:00 ~ 07:30 맑은 정신으로!', effort: '음원과 눈으로 편안하게 따라 읽기', isSixDay: true, allowSick: true },
+                { id: 'english_read_along_morning', group: 'eng', name: '오전 1권 따라 읽기 (Read-Along)', emoji: '🗣️', trigger: '집중듣기 한 책 중 1권 골라서!', effort: '소리 내어 자신 있게 읽으면 성공!', isSixDay: true, allowSick: true },
                 { id: 'math_morning', group: 'math', name: '아침 수학 공부', emoji: '🔢', trigger: '07:30 ~ 08:00', instruction: '컨디션에 따라 2p 완료 또는 4p 해냄을 선택해요!', isMathMorning: true, isSixDay: true, allowSick: true }
             ],
             afternoon: [
@@ -384,7 +384,6 @@
 
         function save() { localStorage.setItem('routineData', JSON.stringify(data)); }
         
-        /* 팝업 유지 시간 연장: 기존 2.2초 -> 4.2초(4200ms) */
         let popupTimer = null;
         function showPopup(m) { 
             const p = document.getElementById('popup'); 
