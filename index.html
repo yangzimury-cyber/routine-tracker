@@ -205,27 +205,71 @@
         .popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.88); color: white; padding: 18px 28px; border-radius: 24px; display: none; z-index: 2000; text-align: center; font-weight: bold; font-size: 15px; border: 1.5px solid #fff; width: 85%; max-width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); line-height: 1.4; }
         .day-box.is-today .day-label { color: #5e35b1; font-weight: bold; text-decoration: underline; }
 
-        /* 영어 수업노트 */
-        #notesView { max-width: 640px; margin: 0 auto; }
-        .notes-count { text-align: right; color: #666; font-size: 14px; margin-bottom: 10px; font-weight: 600; }
-        .lesson { background: white; border-radius: 20px; margin-bottom: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); overflow: hidden; }
-        .lesson summary { list-style: none; cursor: pointer; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
+        /* [개선안 1 전용 UI] 영어 수업노트 & Active Recall 인출 구조 */
+        #notesView, #reviewView { max-width: 680px; margin: 0 auto; }
+        .notes-guide-box {
+            background: #ede7f6;
+            border-left: 5px solid #5e35b1;
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            color: #4a148c;
+            line-height: 1.5;
+            font-weight: 600;
+        }
+        .lesson { background: white; border-radius: 20px; margin-bottom: 16px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); overflow: hidden; }
+        .lesson summary { list-style: none; cursor: pointer; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; background: #fafafa; }
         .lesson summary::-webkit-details-marker { display: none; }
-        .lesson summary b { font-size: 18px; color: #333; display: block; }
+        .lesson summary b { font-size: 17px; color: #333; display: block; }
         .lesson summary small { color: #777; font-size: 13px; }
-        .lesson-body { padding: 0 20px 20px; }
-        .lesson-book { font-size: 13px; color: #777; margin-bottom: 4px; }
-        .lesson-body h3 { font-size: 16px; color: #5e35b1; margin: 18px 0 8px; }
-        .pat { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 12px 0; border-top: 1px dashed #e0e0e0; font-size: 17px; line-height: 1.5; }
-        .pat:first-of-type { border-top: none; }
-        .pat.done .pat-text { color: #2e7d32; }
-        .pat-text { flex: 1; }
-        .pat-check { display: flex; align-items: center; gap: 6px; margin: 0; font-size: 13px; color: #777; white-space: nowrap; }
-        .pat-check input { width: 22px; height: 22px; accent-color: #2e7d32; }
+        .lesson-body { padding: 16px 20px 20px; }
+        .lesson-book { font-size: 13px; color: #5e35b1; font-weight: bold; margin-bottom: 12px; }
+        .lesson-body h3 { font-size: 15px; color: #333; margin: 18px 0 10px; display: flex; align-items: center; gap: 6px; }
+
+        /* Active Recall 인출 블록 */
+        .pat-card {
+            background: #f8f9fa;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 14px;
+            padding: 14px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+        }
+        .pat-card.done { background: #e8f5e9; border-color: #a5d6a7; }
+        .pat-sentence { font-size: 17px; color: #222; line-height: 1.6; margin-bottom: 10px; font-weight: 500; }
         
-        .fix { background: #f3eefb; border-radius: 12px; padding: 10px 14px; margin-bottom: 8px; line-height: 1.5; }
-        .fix .was { color: #888; text-decoration: line-through; text-decoration-color: #e53935; font-size: 14px; }
-        .fix .now { color: #2e7d32; font-weight: 700; font-size: 16px; }
+        /* 은폐/노출 빈칸 블록 (Cloze Mask) */
+        .cloze-blank {
+            display: inline-block;
+            background: #5e35b1;
+            color: #5e35b1;
+            padding: 2px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            user-select: none;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .cloze-blank::before { content: " [ ❓ 문장 떠올려보기 ] "; color: #fff; font-size: 13px; }
+        .cloze-blank.revealed {
+            background: #c8e6c9;
+            color: #1b5e20;
+            box-shadow: none;
+        }
+        .cloze-blank.revealed::before { content: ""; }
+
+        /* 하단 체크 바 */
+        .pat-action-bar { display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed #e0e0e0; padding-top: 8px; margin-top: 6px; }
+        .reveal-toggle-btn { background: none; border: none; color: #5e35b1; font-weight: bold; font-size: 12px; cursor: pointer; padding: 4px 0; }
+        .pat-check { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #2e7d32; font-weight: bold; cursor: pointer; }
+        .pat-check input { width: 20px; height: 20px; accent-color: #2e7d32; cursor: pointer; }
+
+        /* Fixes (교정 문장) 카드 */
+        .fix-card { background: #fff3e0; border: 1.5px solid #ffe0b2; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+        .fix-was { color: #d84315; font-size: 14px; text-decoration: line-through; margin-bottom: 4px; }
+        .fix-now { color: #2e7d32; font-weight: 700; font-size: 16px; line-height: 1.5; }
     </style>
 </head>
 <body>
@@ -244,7 +288,7 @@
             </div>
         </div>
 
-        <!-- 탭 버튼 -->
+        <!-- 상단 탭 버튼 -->
         <div class="tabs">
             <button id="tabRoutine" class="tab-btn active" onclick="showTab('routine')">📅 루틴표</button>
             <button id="tabNotes" class="tab-btn" onclick="showTab('notes')">📖 영어 수업노트</button>
@@ -299,14 +343,21 @@
             </div>
         </div>
 
-        <!-- 영어 수업노트 화면 -->
+        <!-- 영어 수업노트 화면 (개선안 1 적용) -->
         <div id="notesView" style="display:none">
-            <div class="notes-count" id="notesCount"></div>
+            <div class="notes-guide-box">
+                🧠 <b>Active Recall 인출 훈련 모드</b><br>
+                보라색 블록을 보고 문장을 먼저 입으로 떠올려보세요! 터치하면 정답이 나타납니다.
+            </div>
             <div id="lessonList"></div>
         </div>
 
         <!-- 이번 주 복습 화면 -->
         <div id="reviewView" style="display:none">
+            <div class="notes-guide-box">
+                🎯 <b>수업 10분 전 뇌 워밍업!</b><br>
+                숨겨진 주요 문장들을 입으로 3번씩 크게 말하고 접속해 보세요!
+            </div>
             <div id="weekReview"></div>
         </div>
     </div>
@@ -343,36 +394,36 @@
         const normalMsgs = ["대단해! 해냈구나! 🌟", "멋져! 끝까지 해냈어 👍", "최고야! 기분이 좋지? 😊"];
         const sickMsg = ["오늘은 푹 쉬고 빨리 나으자! 💊", "충분한 휴식도 성장의 일부야 🛌"];
 
-        /* 수업 노트 데이터 */
+        /* [개선안 1] Active Recall 빈칸 은폐 구조가 적용된 수업 노트 데이터 */
         const lessons = [
             {
                 date: '2026-09-30', label: '9월 30일 수요일', time: '14:30~14:54', teacher: 'Nicole',
                 book: 'GL3 - The Three Axes (Finish)', pron: '',
                 fixes: [
-                    ['a very short pencil.', 'I have a very short pencil that I really like for a long time.'],
-                    ['smell and story', 'I like the smell of old things and the story behind them.']
+                    { was: 'a very short pencil.', prefix: 'I have a very short pencil that I ', target: 'really like for a long time.' },
+                    { was: 'smell and story', prefix: 'I like the smell of old things and ', target: 'the story behind them.' }
                 ],
                 patterns: [
-                    'My old sketchbook is very old and I like old things.',
-                    'I think he will use the axe for chopping trees.',
-                    "I think he'll buy fruits and maybe buy a house.",
-                    'Do you think he did the right thing?',
-                    "Yes, I do. It's because he helped other people.",
-                    'I will buy food and help others.'
+                    { prefix: 'My old sketchbook is very old and ', target: 'I like old things.' },
+                    { prefix: 'I think he will use ', target: 'the axe for chopping trees.' },
+                    { prefix: 'I think he\'ll buy fruits and ', target: 'maybe buy a house.' },
+                    { prefix: 'Do you think ', target: 'he did the right thing?' },
+                    { prefix: 'Yes, I do. It\'s because ', target: 'he helped other people.' },
+                    { prefix: 'I will buy food and ', target: 'help others.' }
                 ]
             },
             {
                 date: '2026-09-28', label: '9월 28일 월요일', time: '14:30', teacher: 'Nicole',
                 book: 'The Three Axes', pron: '',
                 fixes: [
-                    ['chopping trees.', 'An axe is used for chopping trees.'],
-                    ["I think the mountain god will got the man's axe back.", "I think the mountain god will get the man's axe back."]
+                    { was: 'chopping trees.', prefix: 'An axe is used for ', target: 'chopping trees.' },
+                    { was: 'the mountain god will got...', prefix: 'I think the mountain god will ', target: 'get the man\'s axe back.' }
                 ],
                 patterns: [
-                    'What do you think the poor man will do?',
-                    'I think he wanted his axe back.',
-                    'He will jump into the lake.',
-                    'No, because I like the old axe more than the gold one.'
+                    { prefix: 'What do you think ', target: 'the poor man will do?' },
+                    { prefix: 'I think he ', target: 'wanted his axe back.' },
+                    { prefix: 'He will ', target: 'jump into the lake.' },
+                    { prefix: 'No, because I like the old axe ', target: 'more than the gold one.' }
                 ]
             }
         ];
@@ -559,28 +610,81 @@
             document.getElementById('tabNotes').classList.toggle('active', n);
             document.getElementById('tabReview').classList.toggle('active', r);
             if (n) renderNotes();
+            if (r) renderReview();
         }
 
         function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+        
+        /* 은폐/노출 토글 함수 */
+        function toggleCloze(el) {
+            el.classList.toggle('revealed');
+            if (el.classList.contains('revealed')) {
+                el.textContent = el.getAttribute('data-target');
+            } else {
+                el.textContent = '';
+            }
+        }
+
+        /* [개선안 1 적용] 영어 수업노트 랜더링 함수 */
         function renderNotes() {
             const sorted = [...lessons].sort((a, b) => b.date.localeCompare(a.date));
             document.getElementById('lessonList').innerHTML = sorted.map((l, i) => `
                 <details class="lesson" ${i === 0 ? 'open' : ''}>
-                    <summary><span><b>${esc(l.label)}</b><small>Teacher ${esc(l.teacher)} · ${esc(l.time)}</small></span><span aria-hidden="true">▾</span></summary>
+                    <summary>
+                        <span><b>${esc(l.label)}</b><small>Teacher ${esc(l.teacher)} · ${esc(l.time)}</small></span>
+                        <span aria-hidden="true">▾</span>
+                    </summary>
                     <div class="lesson-body">
                         <div class="lesson-book">📖 ${esc(l.book)}</div>
-                        <h3>🗣️ 오늘 배운 말</h3>
+                        
+                        <h3>🗣️ 오늘 배운 말 (Active Recall)</h3>
                         ${l.patterns.map((p, j) => {
-                            const key = l.date + '-' + j;
-                            return `<div class="pat ${notesDone[key] ? 'done' : ''}">
-                                <div class="pat-text">${esc(p)}</div>
-                                <label class="pat-check"><input type="checkbox" ${notesDone[key] ? 'checked' : ''} onchange="notesDone['${key}'] = this.checked; localStorage.setItem('notesDone', JSON.stringify(notesDone)); renderNotes();">읽었어요</label>
+                            const key = l.date + '-pat-' + j;
+                            const isDone = notesDone[key];
+                            return `<div class="pat-card ${isDone ? 'done' : ''}">
+                                <div class="pat-sentence">
+                                    ${esc(p.prefix)}<span class="cloze-blank" data-target="${esc(p.target)}" onclick="toggleCloze(this)"></span>
+                                </div>
+                                <div class="pat-action-bar">
+                                    <button class="reveal-toggle-btn" onclick="const blank = this.parentElement.previousElementSibling.querySelector('.cloze-blank'); toggleCloze(blank);">👁️ 정답 열기/가리기</button>
+                                    <label class="pat-check">
+                                        <input type="checkbox" ${isDone ? 'checked' : ''} onchange="notesDone['${key}'] = this.checked; localStorage.setItem('notesDone', JSON.stringify(notesDone)); renderNotes();">
+                                        3번 크게 읽었어요
+                                    </label>
+                                </div>
                             </div>`;
                         }).join('')}
-                        <h3>✏️ 이렇게 말하면 더 좋아요</h3>
-                        ${l.fixes.map(f => `<div class="fix"><div class="was">${esc(f[0])}</div><div class="now">${esc(f[1])}</div></div>`).join('')}
+
+                        <h3>✏️ 이렇게 고치면 더 좋아요</h3>
+                        ${l.fixes.map((f, k) => `
+                            <div class="fix-card">
+                                <div class="fix-was">❌ ${esc(f.was)}</div>
+                                <div class="fix-now">
+                                    ⭕ ${esc(f.prefix)}<span class="cloze-blank" data-target="${esc(f.target)}" onclick="toggleCloze(this)"></span>
+                                </div>
+                            </div>
+                        `).join('')}
                     </div>
                 </details>`).join('');
+        }
+
+        /* 이번 주 복습 랜더링 함수 */
+        function renderReview() {
+            const latest = lessons[0];
+            if (!latest) return;
+            document.getElementById('weekReview').innerHTML = `
+                <div class="card">
+                    <h2>🎯 최근 수업 (${esc(latest.label)}) 핵심 복습</h2>
+                    <div style="font-size:14px; color:#555; margin-bottom:12px;">화상영어 접속 전 5분 동안 빈칸을 열어보고 입으로 말해봅시다!</div>
+                    ${latest.patterns.slice(0, 4).map((p, j) => `
+                        <div class="pat-card">
+                            <div class="pat-sentence">
+                                ${esc(p.prefix)}<span class="cloze-blank" data-target="${esc(p.target)}" onclick="toggleCloze(this)"></span>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
         }
 
         // 초기 실행
