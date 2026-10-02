@@ -97,9 +97,10 @@
         /* 루틴 카드 및 그룹별 테마 색상 */
         .routine-card { background: #f8f9fa; border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; border: 1px solid #eef0f2; }
         .routine-card.group-talk { background: #ece4fa; border: 1px solid #b39ddb; border-left: 5px solid #7e57c2; }
-        .routine-card.group-eng2 { background: #dff3e4; border: 1px solid #a5d6a7; border-left: 5px solid #43a047; }
-        .routine-card.group-eng { background: #d6ebff; border: 1px solid #90caf9; border-left: 5px solid #1e88e5; }
-        .routine-card.group-math { background: #f1f8e9; border: 1px solid #c8e6c9; border-left: 5px solid #2e7d32; }
+        .routine-card.group-eng2 { background: #e3f2fd; border: 1px solid #90caf9; border-left: 5px solid #1e88e5; }
+        .routine-card.group-eng { background: #e3f2fd; border: 1px solid #90caf9; border-left: 5px solid #1e88e5; }
+        .routine-card.group-math { background: #e8f5e9; border: 1px solid #a5d6a7; border-left: 5px solid #43a047; }
+        .routine-card.group-other { background: #f3e5f5; border: 1px solid #ce93d8; border-left: 5px solid #8e24aa; }
 
         .routine-header { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
         .routine-emoji { font-size: 22px; }
@@ -139,7 +140,7 @@
         .day-btn:active { transform: scale(0.96); }
         .day-btn.checked { background-color: #2e7d32 !important; border-color: #1b5e20 !important; color: white; }
         .day-btn.circle { background-color: #ff8f00 !important; border-color: #ff6f00 !important; color: white; }
-        .day-btn.sick { background-color: #5c6bc0 !important; border-color: #3949ab !important; font-size: 18px; }
+        .day-btn.sick { background-color: #81c784 !important; border-color: #4caf50 !important; color: white; font-size: 18px; }
         .day-btn.off { background: #eee; border-color: #ddd; color: #ccc; cursor: not-allowed; font-size: 11px; }
         
         /* 아침 수학 전용 버튼 */
@@ -271,6 +272,7 @@
         .fix-was { color: #d84315; font-size: 14px; text-decoration: line-through; margin-bottom: 4px; }
         .fix-now { color: #2e7d32; font-weight: 700; font-size: 16px; line-height: 1.5; }
     </style>
+<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=110200"></script>
 </head>
 <body>
     <div id="popup" class="popup"></div>
@@ -380,11 +382,11 @@
             afternoon: [
                 { id: 'math_afternoon', group: 'math', name: '오후 수학 보충 (2페이지)', emoji: '🧩', trigger: '월/수 하교 후(태권도 전) 또는 저녁 시간', instruction: '아침에 2페이지만 풀었을 때 완성해요!', isMathAfternoon: true, isSixDay: true, allowSick: true },
                 { id: 'talkstation_prep', group: 'talk', name: '화상영어 5분 사전 복습', emoji: '📓', trigger: '월/수 오후 2:20 (수업 10분 전)', instruction: '지난 수업 노트 문장 3번 읽고 뇌 워밍업!', customDays: ['월', '수'], daysNote: '월/수 2:20', allowSick: true },
-                { id: 'english_afternoon', group: 'eng2', name: '오후 영어 집중듣기 (30분)', emoji: '🎧', trigger: '월/수: 태권도 전 / 화/목/금: 저녁 식사 후', isSixDay: true, allowSick: true },
-                { id: 'english_write_sentence', group: 'eng2', name: '마음에 드는 문장 따라 쓰기', emoji: '✏️', isSixDay: true, allowSick: true },
-                { id: 'hanja', name: '한자 학습', emoji: '✍️', customDays: ['1회', '2회', '3회'], activeDays: ['월', '수', '금', '주말'], daysNote: '월/수/금/주말', isSixDay: true, allowSick: true },
-                { id: 'reading_combined', name: '독서 시간', emoji: '📖', trigger: '읽고 싶은 책 자유롭게 꺼내기', weekendEnabled: true, allowSick: true },
-                { id: 'ringfit', name: '운동 (러닝/링핏)', emoji: '🏃', trigger: '식후 한 시간 뒤', weekendEnabled: true, allowSick: true }
+                { id: 'english_afternoon', group: 'eng', name: '오후 영어 집중듣기 (30분)', emoji: '🎧', trigger: '월/수: 태권도 전 / 화/목/금: 저녁 식사 후', isSixDay: true, allowSick: true },
+                { id: 'english_write_sentence', group: 'eng', name: '마음에 드는 문장 따라 쓰기', emoji: '✏️', isSixDay: true, allowSick: true },
+                { id: 'hanja', group: 'other', name: '한자 학습', emoji: '✍️', customDays: ['1회', '2회', '3회'], activeDays: ['월', '수', '금', '주말'], daysNote: '월/수/금/주말', isSixDay: true, allowSick: true },
+                { id: 'reading_combined', group: 'other', name: '독서 시간', emoji: '📖', trigger: '읽고 싶은 책 자유롭게 꺼내기', weekendEnabled: true, allowSick: true },
+                { id: 'ringfit', group: 'other', name: '운동 (러닝/링핏)', emoji: '🏃', trigger: '식후 한 시간 뒤', weekendEnabled: true, allowSick: true }
             ]
         };
 
@@ -392,7 +394,7 @@
         
         const readingMsgs = ["책 속의 보물을 찾았구나! 💎", "생각의 주머니가 한 뼘 더 커졌네! 🎈", "멋진 독서가! 오늘 정말 훌륭해 📖"];
         const normalMsgs = ["대단해! 해냈구나! 🌟", "멋져! 끝까지 해냈어 👍", "최고야! 기분이 좋지? 😊"];
-        const sickMsg = ["오늘은 푹 쉬고 빨리 나으자! 💊", "충분한 휴식도 성장의 일부야 🛌"];
+        const sickMsg = ["오늘은 푹 쉬고 회복하자! 🌿", "충분한 휴식도 성장의 일부야 🛌"];
 
         /* [개선안 1] Active Recall 빈칸 은폐 구조가 적용된 수업 노트 데이터 */
         const lessons = [
@@ -525,7 +527,7 @@
                     dHtml += `<div class="day-box ${d === currentCheckLabel ? 'is-today' : ''}">
                         <div class="day-label">${d}</div>
                         <button class="day-btn ${state}" onclick="toggle('${r.id}','${d}',${r.allowSick})">
-                            ${state === 'checked' ? '<svg class="checkmark" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>' : state === 'circle' ? '<div class="circle-icon"></div>' : state === 'sick' ? '🤒' : ''}
+                            ${state === 'checked' ? '<svg class="checkmark" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>' : state === 'circle' ? '<div class="circle-icon"></div>' : state === 'sick' ? '🌿' : ''}
                         </button>
                     </div>`;
                 }
@@ -577,7 +579,7 @@
                 if(s === 'circle') yellowCount++;
                 if(s === 'sick') sickCount++;
             });
-            const body = `이번 주 루틴 결과입니다!\n\n✅ 완료/해냄: ${greenCount}개\n⭕ 노란 동그라미: ${yellowCount}개\n🤒 아파요: ${sickCount}개\n\n💭 한 마디:\n쉬웠던 것: ${data.weekly.easy || '-'}\n힘들었던 것: ${data.weekly.hard || '-'}\n내일 작전: ${data.weekly.plan || '-'}`;
+            const body = `이번 주 루틴 결과입니다!\n\n✅ 완료/해냄: ${greenCount}개\n⭕ 노란 동그라미: ${yellowCount}개\n🌿 회복/쉬는 날: ${sickCount}개\n\n💭 한 마디:\n쉬웠던 것: ${data.weekly.easy || '-'}\n힘들었던 것: ${data.weekly.hard || '-'}\n내일 작전: ${data.weekly.plan || '-'}`;
             window.location.href = `mailto:?subject=[루틴표] 이번 주 기록&body=${encodeURIComponent(body)}`;
         }
 
