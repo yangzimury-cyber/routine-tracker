@@ -277,7 +277,7 @@
         .fix-now { color: #2e7d32; font-weight: 700; font-size: 16px; line-height: 1.5; margin-bottom: 8px; }
         .fix-action-bar { display: flex; justify-content: flex-end; border-top: 1px dashed #ffe0b2; padding-top: 8px; margin-top: 6px; }
     </style>
-<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=163664"></script>
+<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=165428"></script>
 </head>
 <body>
     <div id="popup" class="popup"></div>
@@ -409,21 +409,21 @@
         const circleMsgs = ["10분만 해도 충분해요. 시작한 게 중요해요! 👍", "조금이라도 해낸 것도 소중해요 🌱"];
         const sickMsg = ["오늘은 푹 쉬고 회복하자! 🌿", "충분한 휴식도 성장의 일부야 🛌"];
 
-        /* [개선안 1] Active Recall 빈칸 은폐 구조가 적용된 수업 노트 데이터 */
+        /* 문장별 따라읽기 횟수 기록이 적용된 수업 노트 데이터 */
         const lessons = [
             {
                 date: '2026-09-30', label: '9월 30일 수요일', time: '14:30~14:54', teacher: 'Nicole',
                 book: 'GL3 - The Three Axes (Finish)', pron: '',
                 fixes: [
-                    { was: 'a very short pencil.', prefix: 'I have a very short pencil that I ', target: 'really like for a long time.' },
+                    { was: 'a very short pencil.', prefix: 'I have a very short pencil that ', target: 'I really like.' },
                     { was: 'smell and story', prefix: 'I like the smell of old things and ', target: 'the story behind them.' }
                 ],
                 patterns: [
-                    { prefix: 'My old sketchbook is very old and ', target: 'I like old things.' },
-                    { prefix: 'I think he will use ', target: 'the axe for chopping trees.' },
-                    { prefix: 'I think he\'ll buy fruits and ', target: 'maybe buy a house.' },
+                    { prefix: 'My sketchbook is very old, and ', target: 'I like old things.' },
+                    { prefix: "I think he'll use the axe to ", target: 'chop trees.' },
+                    { prefix: "I think he'll buy some fruit and maybe ", target: 'a house.' },
                     { prefix: 'Do you think ', target: 'he did the right thing?' },
-                    { prefix: 'Yes, I do. It\'s because ', target: 'he helped other people.' },
+                    { prefix: 'Yes, I do, because ', target: 'he helped other people.' },
                     { prefix: 'I will buy food and ', target: 'help others.' }
                 ]
             },
@@ -431,12 +431,12 @@
                 date: '2026-09-28', label: '9월 28일 월요일', time: '14:30', teacher: 'Nicole',
                 book: 'The Three Axes', pron: '',
                 fixes: [
-                    { was: 'chopping trees.', prefix: 'An axe is used for ', target: 'chopping trees.' },
+                    { was: 'chopping trees.', prefix: 'An axe is used to ', target: 'chop trees.' },
                     { was: 'the mountain god will got...', prefix: 'I think the mountain god will ', target: 'get the man\'s axe back.' }
                 ],
                 patterns: [
                     { prefix: 'What do you think ', target: 'the poor man will do?' },
-                    { prefix: 'I think he ', target: 'wanted his axe back.' },
+                    { prefix: 'I think he ', target: 'wants his axe back.' },
                     { prefix: 'He will ', target: 'jump into the lake.' },
                     { prefix: 'No, because I like the old axe ', target: 'more than the gold one.' }
                 ]
