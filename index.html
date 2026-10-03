@@ -280,7 +280,8 @@
         .fix-was { color: #d84315; font-size: 14px; text-decoration: line-through; margin-bottom: 4px; }
         .fix-now { color: #2e7d32; font-weight: 700; font-size: 16px; line-height: 1.5; }
     </style>
-<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=152374"></script>
+<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=157974"></script>
+<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=157266"></script>
 </head>
 <body>
     <div id="popup" class="popup"></div>
@@ -391,14 +392,14 @@
         const routineData = {
             morning: [
                 { id: 'english_morning', group: 'eng', name: '오전 영어 집중듣기 (30분)', emoji: '🎧', trigger: '07:00 ~ 07:30 맑은 정신으로!', effort: '음원과 눈으로 편안하게 따라 읽기', daysNote: '토·일 각각 오전/오후 중 1회', weekendEnabled: true, allowSick: true },
-                { id: 'english_read_along_morning', group: 'eng', name: '오전 1권 따라 읽기 (Read-Along)', emoji: '🗣️', trigger: '집중듣기 한 책 중 1권 골라서!', effort: '소리 내어 자신 있게 읽으면 성공!', isSixDay: true, allowSick: true },
+                { id: 'english_read_along_morning', group: 'eng', name: '오전 1권 따라 읽기 (Read-Along)', emoji: '🗣️', trigger: '집중듣기 한 책 중 1권 골라서!', effort: '소리 내어 자신 있게 읽으면 성공!', allowSick: true },
                 { id: 'math_morning', group: 'math', name: '아침 수학 공부', emoji: '🔢', trigger: '07:30 ~ 08:00', instruction: '평일은 2p 또는 4p까지 선택해요. 토·일은 2p만 해도 하루 수학 완료!', isMathMorning: true, weekendEnabled: true, allowSick: true }
             ],
             afternoon: [
                 { id: 'math_afternoon', group: 'math', name: '오후 수학 이어서 하기 (2페이지)', emoji: '🧩', trigger: '월/수 하교 후(태권도 전) 또는 저녁 시간', instruction: '오전에 2p까지 했을 때 이어서 마무리해요. 토·일은 쉬어요.', offDays: MATH_PM_OFF, daysNote: '화·목·토·일은 쉬어요', isMathAfternoon: true, weekendEnabled: true, allowSick: true },
                 { id: 'talkstation_prep', group: 'talk', name: '화상영어 5분 사전 복습', emoji: '📓', trigger: '월/수 오후 2:20 (수업 10분 전)', instruction: '지난 수업 노트 문장 3번 읽고 뇌 워밍업!', customDays: ['월', '수'], daysNote: '월/수 2:20', allowSick: true },
                 { id: 'english_afternoon', group: 'eng', name: '오후 영어 집중듣기 (30분)', emoji: '🎧', trigger: '월/수: 태권도 전 / 화/목/금: 저녁 식사 후', daysNote: '토·일 각각 오전/오후 중 1회', weekendEnabled: true, allowSick: true },
-                { id: 'english_write_sentence', group: 'eng', name: '마음에 드는 문장 따라 쓰기', emoji: '✏️', isSixDay: true, allowSick: true },
+                { id: 'english_write_sentence', group: 'eng', name: '마음에 드는 문장 따라 쓰기', emoji: '✏️', customDays: ['토', '일'], daysNote: '토/일', allowSick: true },
                 { id: 'hanja', name: '한자 학습', emoji: '✍️', customDays: ['1회', '2회', '3회'], activeDays: ['월', '수', '금', '주말'], daysNote: '월/수/금/주말', isSixDay: true, allowSick: true },
                 { id: 'reading_combined', name: '독서 시간', emoji: '📖', trigger: '읽고 싶은 책 자유롭게 꺼내기', weekendEnabled: true, allowSick: true },
                 { id: 'ringfit', name: '운동 (러닝/링핏)', emoji: '🏃', trigger: '식후 한 시간 뒤', weekendEnabled: true, allowSick: true }
