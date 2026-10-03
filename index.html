@@ -224,7 +224,7 @@
         .weekend-math-note { font-size: 13px; color: #5e35b1; font-weight: 700; margin-top: 3px; }
 
         /* 영어 수업노트: 문장 따라읽기 확인 구조 */
-        #notesView, #reviewView { max-width: 680px; margin: 0 auto; }
+        #notesView { max-width: 680px; margin: 0 auto; }
         .notes-guide-box {
             background: #ede7f6;
             border-left: 5px solid #5e35b1;
@@ -299,7 +299,6 @@
         <div class="tabs">
             <button id="tabRoutine" class="tab-btn active" onclick="showTab('routine')">📅 루틴표</button>
             <button id="tabNotes" class="tab-btn" onclick="showTab('notes')">📖 영어 수업노트</button>
-            <button id="tabReview" class="tab-btn" onclick="showTab('review')">🎯 이번 주 복습</button>
         </div>
 
         <!-- 루틴표 화면 -->
@@ -365,14 +364,6 @@
             <div id="lessonList"></div>
         </div>
 
-        <!-- 이번 주 복습 화면 -->
-        <div id="reviewView" style="display:none">
-            <div class="notes-guide-box">
-                🎯 <b>수업 10분 전 뇌 워밍업!</b><br>
-                숨겨진 주요 문장들을 입으로 3번씩 크게 말하고 접속해 보세요!
-            </div>
-            <div id="weekReview"></div>
-        </div>
     </div>
 
     <script>
@@ -722,16 +713,13 @@
         function saveReflection() { data.weekly = { easy: document.getElementById('weeklyEasy').value, hard: document.getElementById('weeklyHard').value, plan: document.getElementById('weeklyPlan').value }; save(); alert('저장 완료!'); }
 
         function showTab(t) {
-            const n = t === 'notes', r = t === 'review';
-            document.getElementById('routineView').style.display = (n || r) ? 'none' : 'block';
+            const n = t === 'notes';
+            document.getElementById('routineView').style.display = n ? 'none' : 'block';
             document.getElementById('notesView').style.display = n ? 'block' : 'none';
-            document.getElementById('reviewView').style.display = r ? 'block' : 'none';
-            document.getElementById('filterBox').style.display = (n || r) ? 'none' : 'flex';
-            document.getElementById('tabRoutine').classList.toggle('active', !n && !r);
+            document.getElementById('filterBox').style.display = n ? 'none' : 'flex';
+            document.getElementById('tabRoutine').classList.toggle('active', !n);
             document.getElementById('tabNotes').classList.toggle('active', n);
-            document.getElementById('tabReview').classList.toggle('active', r);
             if (n) renderNotes();
-            if (r) renderReview();
         }
 
         function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
@@ -785,25 +773,6 @@
                         }).join('')}
                     </div>
                 </details>`).join('');
-        }
-
-        /* 이번 주 복습 랜더링 함수 */
-        function renderReview() {
-            const latest = lessons[0];
-            if (!latest) return;
-            document.getElementById('weekReview').innerHTML = `
-                <div class="card">
-                    <h2>🎯 최근 수업 (${esc(latest.label)}) 핵심 복습</h2>
-                    <div style="font-size:14px; color:#555; margin-bottom:12px;">화상영어 접속 전 5분 동안 빈칸을 열어보고 입으로 말해봅시다!</div>
-                    ${latest.patterns.slice(0, 4).map((p, j) => `
-                        <div class="pat-card">
-                            <div class="pat-sentence">
-                                ${esc(p.prefix)}<span class="cloze-blank" data-target="${esc(p.target)}" onclick="toggleCloze(this)"></span>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
         }
 
         // 초기 실행
