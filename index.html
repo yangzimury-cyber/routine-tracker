@@ -223,7 +223,7 @@
         .day-box.is-today .day-label { color: #5e35b1; font-weight: bold; text-decoration: underline; }
         .weekend-math-note { font-size: 13px; color: #5e35b1; font-weight: 700; margin-top: 3px; }
 
-        /* [개선안 1 전용 UI] 영어 수업노트 & Active Recall 인출 구조 */
+        /* 영어 수업노트: 문장 따라읽기 확인 구조 */
         #notesView, #reviewView { max-width: 680px; margin: 0 auto; }
         .notes-guide-box {
             background: #ede7f6;
@@ -245,7 +245,6 @@
         .lesson-book { font-size: 13px; color: #5e35b1; font-weight: bold; margin-bottom: 12px; }
         .lesson-body h3 { font-size: 15px; color: #333; margin: 18px 0 10px; display: flex; align-items: center; gap: 6px; }
 
-        /* Active Recall 인출 블록 */
         .pat-card {
             background: #f8f9fa;
             border: 1.5px solid #e0e0e0;
@@ -256,39 +255,29 @@
         }
         .pat-card.done { background: #e8f5e9; border-color: #a5d6a7; }
         .pat-sentence { font-size: 17px; color: #222; line-height: 1.6; margin-bottom: 10px; font-weight: 500; }
-        
-        /* 은폐/노출 빈칸 블록 (Cloze Mask) */
-        .cloze-blank {
-            display: inline-block;
-            background: #5e35b1;
+        .pat-action-bar { display: flex; justify-content: flex-end; align-items: center; border-top: 1px dashed #e0e0e0; padding-top: 8px; margin-top: 6px; }
+        .read-check-btn {
+            border: 1px solid #b39ddb;
+            background: #fff;
             color: #5e35b1;
-            padding: 2px 10px;
-            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            border-radius: 10px;
+            padding: 7px 12px;
             cursor: pointer;
-            font-weight: bold;
-            user-select: none;
             transition: all 0.2s ease;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
         }
-        .cloze-blank::before { content: " [ ❓ 문장 떠올려보기 ] "; color: #fff; font-size: 13px; }
-        .cloze-blank.revealed {
-            background: #c8e6c9;
-            color: #1b5e20;
-            box-shadow: none;
-        }
-        .cloze-blank.revealed::before { content: ""; }
-
-        /* 하단 체크 바 */
-        .pat-action-bar { display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed #e0e0e0; padding-top: 8px; margin-top: 6px; }
-        .reveal-toggle-btn { background: none; border: none; color: #5e35b1; font-weight: bold; font-size: 12px; cursor: pointer; padding: 4px 0; }
-        .pat-check { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #2e7d32; font-weight: bold; cursor: pointer; }
-        .pat-check input { width: 20px; height: 20px; accent-color: #2e7d32; cursor: pointer; }
+        .read-check-btn:hover:not(:disabled) { background: #f3e5f5; }
+        .read-check-btn.done { background: #e8f5e9; border-color: #81c784; color: #2e7d32; cursor: default; }
+        .read-check-btn:disabled { opacity: 1; }
 
         /* Fixes (교정 문장) 카드 */
         .fix-card { background: #fff3e0; border: 1.5px solid #ffe0b2; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
         .fix-was { color: #d84315; font-size: 14px; text-decoration: line-through; margin-bottom: 4px; }
-        .fix-now { color: #2e7d32; font-weight: 700; font-size: 16px; line-height: 1.5; }
+        .fix-now { color: #2e7d32; font-weight: 700; font-size: 16px; line-height: 1.5; margin-bottom: 8px; }
+        .fix-action-bar { display: flex; justify-content: flex-end; border-top: 1px dashed #ffe0b2; padding-top: 8px; margin-top: 6px; }
     </style>
+<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=163664"></script>
 </head>
 <body>
     <div id="popup" class="popup"></div>
@@ -367,11 +356,11 @@
             </div>
         </div>
 
-        <!-- 영어 수업노트 화면 (개선안 1 적용) -->
+        <!-- 영어 수업노트 화면 -->
         <div id="notesView" style="display:none">
             <div class="notes-guide-box">
-                🧠 <b>Active Recall 인출 훈련 모드</b><br>
-                보라색 블록을 보고 문장을 먼저 입으로 떠올려보세요! 터치하면 정답이 나타납니다.
+                🗣️ <b>배운 문장 따라읽기</b><br>
+                문장을 보면서 소리 내어 2번 읽어 보세요. 문장을 외우거나 빈칸을 떠올릴 필요는 없어요.
             </div>
             <div id="lessonList"></div>
         </div>
@@ -456,8 +445,8 @@
 
         let data = JSON.parse(localStorage.getItem('routineData')) || { routines: {}, weekend: [], bridge: '', weekly: {} };
         let currentFilter = 'all';
-        let notesDone = {};
-        try { notesDone = JSON.parse(localStorage.getItem('notesDone')) || {}; } catch (e) {}
+        let notesReadCount = {};
+        try { notesReadCount = JSON.parse(localStorage.getItem('notesReadCount')) || {}; } catch (e) {}
 
         function save() { localStorage.setItem('routineData', JSON.stringify(data)); }
         
@@ -747,17 +736,16 @@
 
         function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
         
-        /* 은폐/노출 토글 함수 */
-        function toggleCloze(el) {
-            el.classList.toggle('revealed');
-            if (el.classList.contains('revealed')) {
-                el.textContent = el.getAttribute('data-target');
-            } else {
-                el.textContent = '';
-            }
+        /* 문장별 따라읽기 횟수 기록 */
+        function incrementReadCount(key) {
+            const current = Number(notesReadCount[key] || 0);
+            if (current >= 2) return;
+            notesReadCount[key] = current + 1;
+            localStorage.setItem('notesReadCount', JSON.stringify(notesReadCount));
+            renderNotes();
         }
 
-        /* [개선안 1 적용] 영어 수업노트 랜더링 함수 */
+        /* 영어 수업노트 랜더링 함수 */
         function renderNotes() {
             const sorted = [...lessons].sort((a, b) => b.date.localeCompare(a.date));
             document.getElementById('lessonList').innerHTML = sorted.map((l, i) => `
@@ -769,33 +757,32 @@
                     <div class="lesson-body">
                         <div class="lesson-book">📖 ${esc(l.book)}</div>
                         
-                        <h3>🗣️ 오늘 배운 말 (Active Recall)</h3>
+                        <h3>🗣️ 오늘 배운 말</h3>
                         ${l.patterns.map((p, j) => {
                             const key = l.date + '-pat-' + j;
-                            const isDone = notesDone[key];
+                            const count = Math.min(2, Number(notesReadCount[key] || 0));
+                            const isDone = count >= 2;
                             return `<div class="pat-card ${isDone ? 'done' : ''}">
-                                <div class="pat-sentence">
-                                    ${esc(p.prefix)}<span class="cloze-blank" data-target="${esc(p.target)}" onclick="toggleCloze(this)"></span>
-                                </div>
+                                <div class="pat-sentence">${esc(p.prefix)}${esc(p.target)}</div>
                                 <div class="pat-action-bar">
-                                    <button class="reveal-toggle-btn" onclick="const blank = this.parentElement.previousElementSibling.querySelector('.cloze-blank'); toggleCloze(blank);">👁️ 정답 열기/가리기</button>
-                                    <label class="pat-check">
-                                        <input type="checkbox" ${isDone ? 'checked' : ''} onchange="notesDone['${key}'] = this.checked; localStorage.setItem('notesDone', JSON.stringify(notesDone)); renderNotes();">
-                                        3번 크게 읽었어요
-                                    </label>
+                                    <button class="read-check-btn ${isDone ? 'done' : ''}" ${isDone ? 'disabled' : ''} onclick="incrementReadCount('${key}')">${isDone ? '✅ 2회 완료' : `🔊 따라읽기 ${count}/2회`}</button>
                                 </div>
                             </div>`;
                         }).join('')}
 
                         <h3>✏️ 이렇게 고치면 더 좋아요</h3>
-                        ${l.fixes.map((f, k) => `
-                            <div class="fix-card">
+                        ${l.fixes.map((f, k) => {
+                            const key = l.date + '-fix-' + k;
+                            const count = Math.min(2, Number(notesReadCount[key] || 0));
+                            const isDone = count >= 2;
+                            return `<div class="fix-card">
                                 <div class="fix-was">❌ ${esc(f.was)}</div>
-                                <div class="fix-now">
-                                    ⭕ ${esc(f.prefix)}<span class="cloze-blank" data-target="${esc(f.target)}" onclick="toggleCloze(this)"></span>
+                                <div class="fix-now">⭕ ${esc(f.prefix)}${esc(f.target)}</div>
+                                <div class="fix-action-bar">
+                                    <button class="read-check-btn ${isDone ? 'done' : ''}" ${isDone ? 'disabled' : ''} onclick="incrementReadCount('${key}')">${isDone ? '✅ 2회 완료' : `🔊 따라읽기 ${count}/2회`}</button>
                                 </div>
-                            </div>
-                        `).join('')}
+                            </div>`;
+                        }).join('')}
                     </div>
                 </details>`).join('');
         }
