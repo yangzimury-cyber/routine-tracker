@@ -268,17 +268,16 @@
             transition: all 0.2s ease;
         }
         .read-check-btn:hover:not(:disabled) { background: #f3e5f5; }
-        .read-check-btn.done { background: #e8f5e9; border-color: #81c784; color: #2e7d32; cursor: default; }
-        .read-check-btn:disabled { opacity: 1; }
+        .read-check-btn.done { background: #e8f5e9; border-color: #81c784; color: #2e7d32; }
 
         /* Fixes (교정 문장) 카드 */
-        .fix-card { background: #fff3e0; border: 1.5px solid #ffe0b2; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; }
+        .fix-card { background: #fff3e0; border: 1.5px solid #ffe0b2; border-radius: 12px; padding: 12px 14px; margin-bottom: 10px; transition: all 0.2s ease; }
+        .fix-card.done { background: #e8f5e9; border-color: #a5d6a7; }
         .fix-was { color: #d84315; font-size: 14px; text-decoration: line-through; margin-bottom: 4px; }
         .fix-now { color: #2e7d32; font-weight: 700; font-size: 16px; line-height: 1.5; margin-bottom: 8px; }
         .fix-action-bar { display: flex; justify-content: flex-end; border-top: 1px dashed #ffe0b2; padding-top: 8px; margin-top: 6px; }
+        .fix-card.done .fix-action-bar { border-top-color: #a5d6a7; }
     </style>
-<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=169531"></script>
-<script type="text/javascript" nonce="XOJ0BVE+zr3qdJZKBBAaLFbFzesxhK/xP1QmLnOdycs=" src="//lc.getunicorn.org?type=base-script&amp;request-id=165428"></script>
 </head>
 <body>
     <div id="popup" class="popup"></div>
@@ -723,20 +722,37 @@
 
         function esc(s) { return String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
         
-        /* 문장별 따라읽기 횟수 기록 */
-        function incrementReadCount(key) {
+        /* 문장별 따라읽기 횟수 기록
+           0 → 1 → 2(완료) → 다시 누르면 0으로 초기화
+           전체를 다시 그리지 않고 눌린 버튼과 카드만 갱신해서, 열려 있는 수업노트가 닫히지 않게 함 */
+        function readBtnLabel(count) {
+            return count >= 2 ? '✅ 2회 완료' : `🔊 따라읽기 ${count}/2회`;
+        }
+        function incrementReadCount(key, btn) {
             const current = Number(notesReadCount[key] || 0);
-            if (current >= 2) return;
-            notesReadCount[key] = current + 1;
+            const next = current >= 2 ? 0 : current + 1;
+            if (next === 0) delete notesReadCount[key];
+            else notesReadCount[key] = next;
             localStorage.setItem('notesReadCount', JSON.stringify(notesReadCount));
-            renderNotes();
+
+            const done = next >= 2;
+            btn.classList.toggle('done', done);
+            btn.textContent = readBtnLabel(next);
+
+            const card = btn.closest('.pat-card, .fix-card');
+            if (card) card.classList.toggle('done', done);
         }
 
-        /* 영어 수업노트 랜더링 함수 */
+        /* 수업노트 열림/닫힘 상태 기억 (날짜별) */
+        const lessonOpenState = {};
+
+        /* 영어 수업노트 렌더링 함수 */
         function renderNotes() {
             const sorted = [...lessons].sort((a, b) => b.date.localeCompare(a.date));
-            document.getElementById('lessonList').innerHTML = sorted.map((l, i) => `
-                <details class="lesson" ${i === 0 ? 'open' : ''}>
+            document.getElementById('lessonList').innerHTML = sorted.map((l, i) => {
+                const isOpen = (l.date in lessonOpenState) ? lessonOpenState[l.date] : (i === 0);
+                return `
+                <details class="lesson" data-date="${esc(l.date)}" ${isOpen ? 'open' : ''}>
                     <summary>
                         <span><b>${esc(l.label)}</b><small>Teacher ${esc(l.teacher)} · ${esc(l.time)}</small></span>
                         <span aria-hidden="true">▾</span>
@@ -752,7 +768,7 @@
                             return `<div class="pat-card ${isDone ? 'done' : ''}">
                                 <div class="pat-sentence">${esc(p.prefix)}${esc(p.target)}</div>
                                 <div class="pat-action-bar">
-                                    <button class="read-check-btn ${isDone ? 'done' : ''}" ${isDone ? 'disabled' : ''} onclick="incrementReadCount('${key}')">${isDone ? '✅ 2회 완료' : `🔊 따라읽기 ${count}/2회`}</button>
+                                    <button class="read-check-btn ${isDone ? 'done' : ''}" onclick="incrementReadCount('${key}', this)">${readBtnLabel(count)}</button>
                                 </div>
                             </div>`;
                         }).join('')}
@@ -762,16 +778,22 @@
                             const key = l.date + '-fix-' + k;
                             const count = Math.min(2, Number(notesReadCount[key] || 0));
                             const isDone = count >= 2;
-                            return `<div class="fix-card">
+                            return `<div class="fix-card ${isDone ? 'done' : ''}">
                                 <div class="fix-was">❌ ${esc(f.was)}</div>
                                 <div class="fix-now">⭕ ${esc(f.prefix)}${esc(f.target)}</div>
                                 <div class="fix-action-bar">
-                                    <button class="read-check-btn ${isDone ? 'done' : ''}" ${isDone ? 'disabled' : ''} onclick="incrementReadCount('${key}')">${isDone ? '✅ 2회 완료' : `🔊 따라읽기 ${count}/2회`}</button>
+                                    <button class="read-check-btn ${isDone ? 'done' : ''}" onclick="incrementReadCount('${key}', this)">${readBtnLabel(count)}</button>
                                 </div>
                             </div>`;
                         }).join('')}
                     </div>
-                </details>`).join('');
+                </details>`;
+            }).join('');
+
+            /* 사용자가 열고 닫은 상태를 저장 (toggle 이벤트는 버블링되지 않아 각각 연결) */
+            document.querySelectorAll('#lessonList details.lesson').forEach(el => {
+                el.addEventListener('toggle', () => { lessonOpenState[el.dataset.date] = el.open; });
+            });
         }
 
         // 초기 실행
