@@ -375,6 +375,22 @@
         /* 문장별 따라읽기 횟수 기록이 적용된 수업 노트 데이터 */
         const lessons = [
             {
+                date: '2026-10-21', label: '10월 21일 수요일', time: '14:30', teacher: 'Nicole',
+                book: 'Two Good Brothers (Page 6)', pron: '',
+                fixes: [
+                    { was: 'I think they will eat the rice.', prefix: 'I think they will eat the rice and ', target: 'feed their families.' },
+                    { was: 'When dad buys me a cookie', prefix: 'When Dad buys me a cookie, ', target: 'I say "Thank you."' }
+                ],
+                patterns: [
+                    { prefix: "It's the younger brother who ", target: 'had a baby boy.' },
+                    { prefix: 'I think the older brother ', target: 'is good.' },
+                    { prefix: 'I think the older brother will give ', target: 'the younger brother more rice.' },
+                    { prefix: 'The younger brother will give ', target: 'the older brother the rice.' },
+                    { prefix: 'I have a small family. ', target: "There's Mom, Dad, and me." },
+                    { prefix: 'I think they felt ', target: 'surprised and thankful.' }
+                ]
+            },
+            {
                 date: '2026-10-19', label: '10월 19일 월요일', time: '14:30', teacher: 'Nicole',
                 book: 'Moon Rabbit (Page 6)', pron: '',
                 fixes: [
