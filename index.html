@@ -375,6 +375,17 @@
         /* 문장별 따라읽기 횟수 기록이 적용된 수업 노트 데이터 */
         const lessons = [
             {
+                date: '2026-11-09', label: '11월 9일 월요일', time: '14:30', teacher: 'Nicole',
+                book: "iDic Kids' Talk A - Lesson 3 (What are you doing?)", pron: '',
+                fixes: [],
+                patterns: [
+                    { prefix: 'I am reading ', target: 'my favorite book.' },
+                    { prefix: 'I read ', target: 'a few chapters a day.' },
+                    { prefix: 'I am cleaning the room. ', target: 'I want to help my mom with the chores.' },
+                    { prefix: 'I am sleeping at my desk because I am tired. ', target: 'Also, I went to bed late last night.' }
+                ]
+            },
+            {
                 date: '2026-11-04', label: '11월 4일 수요일', time: '14:30', teacher: 'Nicole',
                 book: 'The Lazy Boy and the Cow Mask (Page 6)', pron: '',
                 fixes: [
@@ -819,7 +830,7 @@
                             </div>`;
                         }).join('')}
 
-                        <h3>✏️ 이렇게 고치면 더 좋아요</h3>
+                        ${l.fixes.length ? '<h3>✏️ 이렇게 고치면 더 좋아요</h3>' : ''}
                         ${l.fixes.map((f, k) => {
                             const key = l.date + '-fix-' + k;
                             const count = Math.min(2, Number(notesReadCount[key] || 0));
